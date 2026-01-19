@@ -23,6 +23,11 @@ export const metadata: Metadata = {
   description: "Expert property consultant in Pune. Find your perfect property - Residential, Investment, and Commercial opportunities.",
   keywords: "property consultant Pune, real estate Pune, residential properties, investment properties",
   authors: [{ name: "Charushila Bhalerao" }],
+  icons: {
+    icon: "/logo.svg",
+    shortcut: "/logo.svg",
+    apple: "/logo.svg",
+  },
   openGraph: {
     type: "website",
     locale: "en_IN",
