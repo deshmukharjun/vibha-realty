@@ -5,16 +5,23 @@
   "installCommand": "npm ci",
   "framework": "nextjs",
   "env": {
-    "NEXT_PUBLIC_SANITY_PROJECT_ID": {
-      "description": "Your Sanity project ID"
+    "NEXT_PUBLIC_FIREBASE_API_KEY": {
+      "description": "Your Firebase API Key"
     },
-    "NEXT_PUBLIC_SANITY_DATASET": {
-      "description": "Your Sanity dataset name",
-      "default": "production"
+    "NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN": {
+      "description": "Your Firebase Auth Domain"
     },
-    "NEXT_PUBLIC_SANITY_API_VERSION": {
-      "description": "Sanity API version",
-      "default": "2024-01-01"
+    "NEXT_PUBLIC_FIREBASE_PROJECT_ID": {
+      "description": "Your Firebase Project ID"
+    },
+    "NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET": {
+      "description": "Your Firebase Storage Bucket"
+    },
+    "NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID": {
+      "description": "Your Firebase Messaging Sender ID"
+    },
+    "NEXT_PUBLIC_FIREBASE_APP_ID": {
+      "description": "Your Firebase App ID"
     },
     "NEXT_PUBLIC_WHATSAPP_NUMBER": {
       "description": "WhatsApp phone number with country code (91 for India)",
