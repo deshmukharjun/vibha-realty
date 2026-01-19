@@ -1,18 +1,19 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, use } from 'react'
 import { useRouter } from 'next/navigation'
 import { addArea, updateArea, getArea } from '@/hooks/useCMS'
 import Link from 'next/link'
 import type { Area } from '@/types/cms'
 
 interface Props {
-  params: { id?: string }
+  params: Promise<{ id?: string }>
 }
 
 export default function AreaEditor({ params }: Props) {
   const router = useRouter()
-  const isEditMode = params?.id && params.id !== 'new'
+  const { id } = use(params)
+  const isEditMode = id && id !== 'new'
 
   const [formData, setFormData] = useState({
     name: '',
@@ -26,10 +27,10 @@ export default function AreaEditor({ params }: Props) {
 
   useEffect(() => {
     const loadArea = async () => {
-      if (isEditMode && params?.id) {
+      if (isEditMode && id) {
         setFetching(true)
         try {
-          const area = await getArea(params.id)
+          const area = await getArea(id)
           if (area) {
             setFormData({
               name: area.name,
@@ -47,7 +48,7 @@ export default function AreaEditor({ params }: Props) {
       }
     }
     loadArea()
-  }, [isEditMode, params?.id])
+  }, [isEditMode, id])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -55,8 +56,8 @@ export default function AreaEditor({ params }: Props) {
     setLoading(true)
 
     try {
-      if (isEditMode && params?.id) {
-        await updateArea(params.id, formData)
+      if (isEditMode && id) {
+        await updateArea(id, formData)
       } else {
         await addArea(formData)
       }

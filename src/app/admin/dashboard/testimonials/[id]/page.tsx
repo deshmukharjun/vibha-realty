@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, use } from 'react'
 import { useRouter } from 'next/navigation'
 import { addTestimonial, updateTestimonial, getTestimonial } from '@/hooks/useCMS'
 import { useAreas } from '@/hooks/useCMS'
@@ -8,13 +8,14 @@ import Link from 'next/link'
 import type { Testimonial } from '@/types/cms'
 
 interface Props {
-  params: { id?: string }
+  params: Promise<{ id?: string }>
 }
 
 export default function TestimonialEditor({ params }: Props) {
   const router = useRouter()
   const { areas } = useAreas()
-  const isEditMode = params?.id && params.id !== 'new'
+  const { id } = use(params)
+  const isEditMode = id && id !== 'new'
 
   const [formData, setFormData] = useState({
     clientName: '',
@@ -30,10 +31,10 @@ export default function TestimonialEditor({ params }: Props) {
 
   useEffect(() => {
     const loadTestimonial = async () => {
-      if (isEditMode && params?.id) {
+      if (isEditMode && id) {
         setFetching(true)
         try {
-          const testimonial = await getTestimonial(params.id)
+          const testimonial = await getTestimonial(id)
           if (testimonial) {
             setFormData({
               clientName: testimonial.clientName,
@@ -53,22 +54,22 @@ export default function TestimonialEditor({ params }: Props) {
       }
     }
     loadTestimonial()
-  }, [isEditMode, params?.id])
+  }, [isEditMode, id])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
     setLoading(true)
 
-    if (isEditMode && !params?.id) {
+    if (isEditMode && !id) {
       setError('Invalid testimonial ID')
       setLoading(false)
       return
     }
 
     try {
-      if (isEditMode && params.id) {
-        await updateTestimonial(params.id, formData)
+      if (isEditMode && id) {
+        await updateTestimonial(id, formData)
       } else {
         await addTestimonial(formData)
       }

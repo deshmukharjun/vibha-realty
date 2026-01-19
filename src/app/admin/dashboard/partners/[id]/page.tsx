@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, use } from 'react'
 import { useRouter } from 'next/navigation'
 import { addChannelPartner, updateChannelPartner, getChannelPartner } from '@/hooks/useCMS'
 import { useAreas } from '@/hooks/useCMS'
@@ -8,13 +8,14 @@ import Link from 'next/link'
 import type { ChannelPartner } from '@/types/cms'
 
 interface Props {
-  params: { id?: string }
+  params: Promise<{ id?: string }>
 }
 
 export default function PartnerEditor({ params }: Props) {
   const router = useRouter()
   const { areas } = useAreas()
-  const isEditMode = params?.id && params.id !== 'new'
+  const { id } = use(params)
+  const isEditMode = id && id !== 'new'
 
   const [formData, setFormData] = useState<{
     name: string
@@ -39,10 +40,10 @@ export default function PartnerEditor({ params }: Props) {
 
   useEffect(() => {
     const loadPartner = async () => {
-      if (isEditMode && params?.id) {
+      if (isEditMode && id) {
         setFetching(true)
         try {
-          const partner = await getChannelPartner(params.id)
+          const partner = await getChannelPartner(id)
           if (partner) {
             setFormData({
               name: partner.name,
@@ -63,7 +64,7 @@ export default function PartnerEditor({ params }: Props) {
       }
     }
     loadPartner()
-  }, [isEditMode, params?.id])
+  }, [isEditMode, id])
 
   const addPropertyType = () => {
     if (propertyTypeInput.trim() && !formData.propertyTypes.includes(propertyTypeInput.trim())) {
@@ -96,15 +97,15 @@ export default function PartnerEditor({ params }: Props) {
     setError('')
     setLoading(true)
 
-    if (isEditMode && !params?.id) {
+    if (isEditMode && !id) {
       setError('Invalid partner ID')
       setLoading(false)
       return
     }
 
     try {
-      if (isEditMode && params.id) {
-        await updateChannelPartner(params.id, formData)
+      if (isEditMode && id) {
+        await updateChannelPartner(id, formData)
       } else {
         await addChannelPartner(formData)
       }

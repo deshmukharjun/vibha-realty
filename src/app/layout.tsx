@@ -45,7 +45,7 @@ export default function RootLayout({
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-white`} suppressHydrationWarning>
         <Header whatsappNumber={WHATSAPP_NUMBER} />
-        <main className="pb-20 md:pb-0">
+        <main className="pb-24 md:pb-0">
           {children}
         </main>
         <StickyHeader whatsappNumber={WHATSAPP_NUMBER} />

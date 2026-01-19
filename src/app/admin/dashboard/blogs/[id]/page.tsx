@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, use } from 'react'
 import { useRouter } from 'next/navigation'
 import { addBlogPost, updateBlogPost, getBlogPost } from '@/hooks/useCMS'
 import { useAreas } from '@/hooks/useCMS'
@@ -8,13 +8,14 @@ import Link from 'next/link'
 import type { BlogPost } from '@/types/cms'
 
 interface Props {
-  params: { id?: string }
+  params: Promise<{ id?: string }>
 }
 
 export default function BlogEditor({ params }: Props) {
   const router = useRouter()
   const { areas } = useAreas()
-  const isEditMode = params?.id && params.id !== 'new'
+  const { id } = use(params)
+  const isEditMode = id && id !== 'new'
 
   const [formData, setFormData] = useState<{
     title: string
@@ -48,10 +49,10 @@ export default function BlogEditor({ params }: Props) {
 
   useEffect(() => {
     const loadPost = async () => {
-      if (isEditMode && params?.id) {
+      if (isEditMode && id) {
         setFetching(true)
         try {
-          const post = await getBlogPost(params.id)
+          const post = await getBlogPost(id)
           if (post) {
             const postData = {
               title: post.title,
@@ -78,7 +79,7 @@ export default function BlogEditor({ params }: Props) {
       }
     }
     loadPost()
-  }, [isEditMode, params?.id])
+  }, [isEditMode, id])
 
   const generateSlug = (title: string) => {
     return title
@@ -101,7 +102,7 @@ export default function BlogEditor({ params }: Props) {
     setError('')
     setLoading(true)
 
-    if (isEditMode && !params?.id) {
+    if (isEditMode && !id) {
       setError('Invalid blog post ID')
       setLoading(false)
       return
@@ -114,8 +115,8 @@ export default function BlogEditor({ params }: Props) {
         readingTime: parseInt(formData.readingTime.toString()),
       }
 
-      if (isEditMode && params.id) {
-        await updateBlogPost(params.id, postData)
+      if (isEditMode && id) {
+        await updateBlogPost(id, postData)
       } else {
         await addBlogPost(postData as any)
       }
