@@ -16,12 +16,19 @@ export default function PartnerEditor({ params }: Props) {
   const { areas } = useAreas()
   const isEditMode = params?.id && params.id !== 'new'
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    name: string
+    description: string
+    propertyTypes: string[]
+    areas: string[]
+    status: 'active' | 'inactive'
+    logo: string
+  }>({
     name: '',
     description: '',
-    propertyTypes: [] as string[],
-    areas: [] as string[],
-    status: 'active' as const,
+    propertyTypes: [],
+    areas: [],
+    status: 'active',
     logo: '',
   })
 
@@ -89,8 +96,14 @@ export default function PartnerEditor({ params }: Props) {
     setError('')
     setLoading(true)
 
+    if (isEditMode && !params?.id) {
+      setError('Invalid partner ID')
+      setLoading(false)
+      return
+    }
+
     try {
-      if (isEditMode) {
+      if (isEditMode && params.id) {
         await updateChannelPartner(params.id, formData)
       } else {
         await addChannelPartner(formData)

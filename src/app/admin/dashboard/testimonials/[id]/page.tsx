@@ -60,8 +60,14 @@ export default function TestimonialEditor({ params }: Props) {
     setError('')
     setLoading(true)
 
+    if (isEditMode && !params?.id) {
+      setError('Invalid testimonial ID')
+      setLoading(false)
+      return
+    }
+
     try {
-      if (isEditMode) {
+      if (isEditMode && params.id) {
         await updateTestimonial(params.id, formData)
       } else {
         await addTestimonial(formData)
