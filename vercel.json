@@ -1,0 +1,24 @@
+{
+  "version": 2,
+  "buildCommand": "npm run build",
+  "devCommand": "npm run dev",
+  "installCommand": "npm ci",
+  "framework": "nextjs",
+  "env": {
+    "NEXT_PUBLIC_SANITY_PROJECT_ID": {
+      "description": "Your Sanity project ID"
+    },
+    "NEXT_PUBLIC_SANITY_DATASET": {
+      "description": "Your Sanity dataset name",
+      "default": "production"
+    },
+    "NEXT_PUBLIC_SANITY_API_VERSION": {
+      "description": "Sanity API version",
+      "default": "2024-01-01"
+    },
+    "NEXT_PUBLIC_WHATSAPP_NUMBER": {
+      "description": "WhatsApp phone number with country code (91 for India)",
+      "default": "919876543210"
+    }
+  }
+}
