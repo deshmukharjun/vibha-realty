@@ -9,30 +9,71 @@ const WHATSAPP_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "919881199152
 export default function About() {
   return (
     <>
-      <section className="py-16 md:py-24 bg-white">
+      <section className="relative py-20 md:py-28 overflow-hidden">
+        {/* Background image with soft overlay */}
+        <Image
+          src="/bgabout.jpg"
+          alt="Background"
+          fill
+          priority
+          className="object-cover opacity-100 pointer-events-none select-none"
+        />
+        <div className="absolute inset-0 bg-gradient-to-br opacity-70 from-green-50/100 via-white/90 to-green-50/100" />
+
         <Container maxWidth="lg">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-            <Image
-              src="/headshot.jpeg"
-              alt="Charushila Bhalerao"
-              width={500}
-              height={600}
-              className="w-full h-auto rounded-xl shadow-lg object-cover order-2 md:order-1"
-            />
-            <div className="order-1 md:order-2">
-              <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-                Hey there! <br />I'm Charushila Bhalerao
+          <div className="relative grid grid-cols-1 md:grid-cols-2 gap-14 items-stretch">
+            
+            {/* Image */}
+            <div className="order-2 md:order-1 relative h-full min-h-[500px] md:min-h-[600px]">
+              <Image
+                src="/headshot_vertical.png"
+                alt="Charushila Bhalerao – Pune Real Estate Consultant"
+                fill
+                className="rounded-2xl object-cover shadow-[0_20px_40px_rgba(0,0,0,0.12)]"
+              />
+            </div>
+
+            {/* Content */}
+            <div className="order-1 md:order-2 bg-white/10 backdrop-blur-xs border-2 border-white/40 p-4 rounded-xl shadow-xl">
+              
+              {/* Authority headline */}
+              <h1 className="text-3xl md:text-4xl font-semibold text-gray-900 leading-tight">
+              Hey there, I'm Charushila Bhalerao
               </h1>
-              <p className="text-lg text-gray-700 mb-4 leading-relaxed">
-                With over 15 years of experience in Pune real estate, I have helped hundreds of families find their perfect homes and investors discover lucrative opportunities.
+
+              {/* Human introduction */}
+              <h2 className="mt-2 text-xl md:text-2xl font-medium text-gray-600">
+                12+ Years of Trusted Real Estate Expertise in Pune
+              </h2>
+
+              {/* Credibility chips */}
+              <div className="mt-5 flex flex-wrap gap-3 text-sm text-gray-600">
+                <span className="px-3 py-1 border border-gray-200 rounded-full">
+                  Residential & Investment
+                </span>
+                <span className="px-3 py-1 border border-gray-200 rounded-full">
+                  Pune Specialist
+                </span>
+                <span className="px-3 py-1 border border-gray-200 rounded-full">
+                  Client-First Approach
+                </span>
+              </div>
+
+              {/* Primary value paragraph */}
+              <p className="mt-6 text-lg text-gray-800 leading-relaxed">
+                Over the last decade and a half, I’ve helped hundreds of families find homes they love and guided investors toward properties that deliver real, long-term value.
               </p>
-              <p className="text-lg text-gray-700 mb-4 leading-relaxed">
-                My approach is simple: understand your needs, guide you honestly, and connect you with the right property. No pressure. Just genuine consultation.
+
+              {/* Philosophy / reassurance */}
+              <p className="mt-4 text-lg text-gray-800 leading-relaxed">
+                My approach is simple—listen carefully, advise honestly, and recommend only what truly fits your needs. No pressure. No sales theatrics.
               </p>
+
             </div>
           </div>
         </Container>
       </section>
+
 
       <section className="py-16 md:py-24 bg-gray-50">
         <Container>

@@ -63,7 +63,7 @@ export function EnquiryForm({ areas = [], whatsappNumber }: EnquiryFormProps) {
           onChange={handleChange}
           required
           placeholder="Your name"
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 placeholder:text-gray-500"
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-black placeholder:text-gray-500"
         />
       </div>
 
@@ -79,7 +79,7 @@ export function EnquiryForm({ areas = [], whatsappNumber }: EnquiryFormProps) {
           required
           placeholder="10-digit number"
           pattern="[0-9]{10}"
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 placeholder:text-gray-500"
+          className="w-full px-4 py-2 border border-gray-300 text-black rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 placeholder:text-gray-500"
         />
       </div>
 

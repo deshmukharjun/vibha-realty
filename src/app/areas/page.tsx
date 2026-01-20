@@ -58,13 +58,15 @@ export default function Areas() {
             <p className="text-lg mb-8 text-green-100">
               Tell me your budget and requirements. I will suggest the best areas for you.
             </p>
-            <a href={`https://wa.me/${WHATSAPP_NUMBER}?text=Hi Vibha, I am confused about which area to choose. Can you suggest?`}>
-              <Button variant="outline" size="lg" className="group">
-                <Image src="/whatsapp.svg" alt="WhatsApp" width={20} height={20} className="group-hover:hidden" />
-                <Image src="/whatsapp_green.svg" alt="WhatsApp" width={20} height={20} className="hidden group-hover:inline-block" />
-                Get Personalized Suggestions
-              </Button>
-            </a>
+            <div className="flex justify-center">
+              <a href={`https://wa.me/${WHATSAPP_NUMBER}?text=Hi Vibha, I am confused about which area to choose. Can you suggest?`}>
+                <Button variant="outline" size="lg" className="group">
+                  <Image src="/whatsapp.svg" alt="WhatsApp" width={20} height={20} className="group-hover:hidden" />
+                  <Image src="/whatsapp_green.svg" alt="WhatsApp" width={20} height={20} className="hidden group-hover:inline-block" />
+                  Get Personalized Suggestions
+                </Button>
+              </a>
+            </div>
           </div>
         </Container>
       </section>

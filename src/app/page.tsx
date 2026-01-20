@@ -12,9 +12,19 @@ export default function Home() {
   return (
     <>
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-green-50 to-blue-50 py-16 md:py-24">
+      <section className="relative py-16 md:py-24 overflow-hidden">
+        {/* Background image with soft overlay */}
+        <Image
+          src="/bgl.jpg"
+          alt="Pune city skyline"
+          fill
+          priority
+          className="object-cover opacity-100 pointer-events-none select-none"
+        />  
+        <div className="absolute inset-0 bg-gradient-to-br opacity-70 from-green-50/100 via-white/90 to-green-50/100" />
+
         <Container>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
+          <div className="relative grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch">
             {/* Left Content */}
             <div>
               <h1 className="text-4xl md:text-5xl font-bold text-gray-900 leading-tight mb-6">
@@ -31,19 +41,19 @@ export default function Home() {
               <div className="grid grid-cols-3 gap-4 mb-8">
                 <div className="text-center">
                   <div className="text-3xl font-bold text-green-600 mb-2">
-                    <CountUpNumber end={15} suffix="+" />
+                    <CountUpNumber end={12} suffix="+" />
                   </div>
                   <p className="text-sm text-gray-700">Years Experience</p>
                 </div>
                 <div className="text-center">
                   <div className="text-3xl font-bold text-green-600 mb-2">
-                    <CountUpNumber end={500} suffix="+" />
+                    <CountUpNumber end={420} suffix="+" />
                   </div>
                   <p className="text-sm text-gray-700">Happy Clients</p>
                 </div>
                 <div className="text-center">
                   <div className="text-3xl font-bold text-green-600 mb-2">
-                    <CountUpNumber end={100} suffix="+" />
+                    <CountUpNumber end={67} suffix="+" />
                   </div>
                   <p className="text-sm text-gray-700">Projects</p>
                 </div>
@@ -52,22 +62,22 @@ export default function Home() {
               {/* CTA Buttons */}
               <div className="flex flex-col gap-3 sm:gap-4">
                 <Link href="/contact" className="w-full">
-                  <Button variant="primary" size="lg" className="w-full whitespace-nowrap">
+                  <Button variant="primary" size="md" className="w-full whitespace-nowrap">
                     <Image src="/whatsapp.svg" alt="WhatsApp" width={24} height={24} />
-                    Looking for a Property?
+                    Connect on WhatsApp
                   </Button>
                 </Link>
                 <a href={`tel:+${WHATSAPP_NUMBER}`} className="w-full">
-                  <Button variant="outlineLight" size="lg" className="w-full whitespace-nowrap">
+                  <Button variant="outlineLight" size="md" className="w-full whitespace-nowrap">
                     <Phone size={24} />
-                    Call Now
+                    Get on a Call
                   </Button>
                 </a>
               </div>
             </div>
 
             {/* Right - Form */}
-            <div className="bg-white p-6 rounded-xl shadow-lg flex flex-col">
+            <div className="bg-white/10 backdrop-blur-xs border-2 border-white/40 p-6 rounded-xl shadow-xl flex flex-col">
               <h2 className="text-2xl font-bold text-gray-900 mb-2">
                 Quick Enquiry
               </h2>
@@ -92,11 +102,11 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {[
               { icon: "", title: "Residential", desc: "Apartments, villas, and homes" },
               { icon: "", title: "Commercial", desc: "Office spaces and retail" },
-              { icon: "", title: "Investment", desc: "High-return investment properties" },
+              { icon: "", title: "Lands", desc: "High-return investment Lands" },
             ].map((item, i) => (
               <div key={i} className="p-8 border border-gray-200 rounded-lg hover:shadow-lg transition">
                 <div className="text-4xl mb-4">{item.icon}</div>

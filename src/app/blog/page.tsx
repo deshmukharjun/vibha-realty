@@ -56,12 +56,14 @@ export default function Blog() {
             <p className="text-gray-700 mb-8">
               Subscribe to get notified about new blog posts and residential opportunities in your preferred areas.
             </p>
-            <Link href="/contact">
-              <Button variant="primary" size="md">
-                <Image src="/whatsapp.svg" alt="WhatsApp" width={20} height={20} />
-                Contact Me for Updates
-              </Button>
-            </Link>
+            <div className="flex justify-center">
+              <Link href="/contact">
+                <Button variant="primary" size="md">
+                  <Image src="/whatsapp.svg" alt="WhatsApp" width={20} height={20} />
+                  Contact Me for Updates
+                </Button>
+              </Link>
+            </div>
           </div>
         </Container>
       </section>

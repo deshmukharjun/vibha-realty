@@ -22,17 +22,19 @@ export default function Projects() {
 
       <section className="py-16 md:py-24 bg-gray-50">
         <Container>
-          <div className="bg-white p-8 md:p-12 rounded-lg border border-gray-200">
+          <div className="bg-white p-8 md:p-12 rounded-lg border border-gray-200 text-center">
             <h2 className="text-2xl font-bold text-gray-900 mb-4">Looking for a Specific Property?</h2>
             <p className="text-gray-600 mb-6">
               I have access to properties from all major builders and can help you find exactly what you are looking for.
             </p>
-            <Link href="/contact">
-              <Button variant="primary" size="md">
-                <Image src="/whatsapp.svg" alt="WhatsApp" width={20} height={20} />
-                Send Enquiry
-              </Button>
-            </Link>
+            <div className="flex justify-center">
+              <Link href="/contact">
+                <Button variant="primary" size="md">
+                  <Image src="/whatsapp.svg" alt="WhatsApp" width={20} height={20} />
+                  Send Enquiry
+                </Button>
+              </Link>
+            </div>
           </div>
         </Container>
       </section>
