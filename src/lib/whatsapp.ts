@@ -12,7 +12,9 @@ export function createWhatsAppMessage(
   area?: string
 ): string {
   const areaText = area ? ` in ${area}` : "";
-  return `Hi Vibha, I'm looking for a property${areaText}. My name is ${name}. I'm interested in ${requirement}. Please help me!`;
+  // Convert requirement to proper gerund form
+  const requirementText = requirement === "buy" ? "buying" : requirement === "rent" ? "renting" : "investing";
+  return `Hi Charushila, I'm looking for a property${areaText}. My name is ${name}. I'm interested in ${requirementText}. Please help me!`;
 }
 
 export function openWhatsApp(

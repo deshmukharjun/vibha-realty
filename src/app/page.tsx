@@ -24,17 +24,17 @@ export default function Home() {
         <div className="absolute inset-0 bg-gradient-to-br opacity-70 from-green-50/100 via-white/90 to-green-50/100" />
 
         <Container>
-          <div className="relative grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch">
+          <div className="relative grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12 items-stretch">
             {/* Left Content */}
             <div>
               <h1 className="text-4xl md:text-5xl font-bold text-gray-900 leading-tight mb-6">
-                Find Your Perfect Property
+                Your Dream Property in Pune Starts Here
               </h1>
               <p className="text-lg text-gray-700 mb-4">
-                Experienced property consultant helping you navigate Pune real estate market.
+                With 12+ years of expertise, I've helped over 420 families find their perfect home and guided investors to properties that deliver real returns. No pressure, just honest guidance tailored to your needs.
               </p>
               <p className="text-lg text-gray-700 mb-8">
-                Whether you are looking to buy, rent, or invest, I am here to guide you with expert knowledge and personalized service.
+                From premium apartments in Baner to investment opportunities in Wakad, I know Pune's real estate market inside out. Let's find the property that fits your lifestyle, budget, and future goals.
               </p>
 
               {/* Trust Indicators */}
@@ -43,19 +43,19 @@ export default function Home() {
                   <div className="text-3xl font-bold text-green-600 mb-2">
                     <CountUpNumber end={12} suffix="+" />
                   </div>
-                  <p className="text-sm text-gray-700">Years Experience</p>
+                  <p className="text-sm text-gray-700">Years of Trust</p>
                 </div>
                 <div className="text-center">
                   <div className="text-3xl font-bold text-green-600 mb-2">
                     <CountUpNumber end={420} suffix="+" />
                   </div>
-                  <p className="text-sm text-gray-700">Happy Clients</p>
+                  <p className="text-sm text-gray-700">Families Helped</p>
                 </div>
                 <div className="text-center">
                   <div className="text-3xl font-bold text-green-600 mb-2">
                     <CountUpNumber end={67} suffix="+" />
                   </div>
-                  <p className="text-sm text-gray-700">Projects</p>
+                  <p className="text-sm text-gray-700">Successful Projects</p>
                 </div>
               </div>
 
@@ -79,10 +79,10 @@ export default function Home() {
             {/* Right - Form */}
             <div className="bg-white/10 backdrop-blur-xs border-2 border-white/40 p-6 rounded-xl shadow-xl flex flex-col">
               <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                Quick Enquiry
+                Start Your Property Search Today
               </h2>
               <p className="text-gray-700 mb-6">
-                Tell me about your property needs
+                Share your requirements and I'll send you curated options within 24 hours
               </p>
               <EnquiryForm whatsappNumber={WHATSAPP_NUMBER} areas={["Baner", "Pune City", "Wakad", "Hadapsar"]} />
             </div>
@@ -153,7 +153,7 @@ export default function Home() {
               Connect with me on WhatsApp or call directly. I will help you find the perfect property.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <a href={`https://wa.me/${WHATSAPP_NUMBER}?text=Hi Vibha, I am interested in a property`}>
+              <a href={`https://wa.me/${WHATSAPP_NUMBER}?text=Hi Charushila, I am interested in a property`}>
                 <Button variant="outline" size="lg" className="group">
                   <Image src="/whatsapp.svg" alt="WhatsApp" width={20} height={20} className="group-hover:hidden" />
                   <Image src="/whatsapp_green.svg" alt="WhatsApp" width={20} height={20} className="hidden group-hover:inline-block" />

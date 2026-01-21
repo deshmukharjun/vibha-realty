@@ -26,7 +26,7 @@ export default function About() {
             {/* Image */}
             <div className="order-2 md:order-1 relative h-full min-h-[500px] md:min-h-[600px]">
               <Image
-                src="/headshot_vertical.png"
+                src="/headshot.jpeg"
                 alt="Charushila Bhalerao – Pune Real Estate Consultant"
                 fill
                 className="rounded-2xl object-cover shadow-[0_20px_40px_rgba(0,0,0,0.12)]"
@@ -34,11 +34,11 @@ export default function About() {
             </div>
 
             {/* Content */}
-            <div className="order-1 md:order-2 bg-white/10 backdrop-blur-xs border-2 border-white/40 p-4 rounded-xl shadow-xl">
+            <div className="order-1 md:order-2 bg-white/10 backdrop-blur-xs border-2 border-white/40 p-6 rounded-xl shadow-xl">
               
               {/* Authority headline */}
               <h1 className="text-3xl md:text-4xl font-semibold text-gray-900 leading-tight">
-              Hey there, I'm Charushila Bhalerao
+              Hi, I'm Charushila Bhalerao
               </h1>
 
               {/* Human introduction */}
@@ -61,12 +61,17 @@ export default function About() {
 
               {/* Primary value paragraph */}
               <p className="mt-6 text-lg text-gray-800 leading-relaxed">
-                Over the last decade and a half, I’ve helped hundreds of families find homes they love and guided investors toward properties that deliver real, long-term value.
+                Over the last <b>12+ years</b>, I've helped over <b>420 families</b> find their dream homes in Pune's most sought-after neighborhoods. From first-time buyers navigating their way through Baner's premium apartments to seasoned investors building portfolios in Wakad.
               </p>
 
               {/* Philosophy / reassurance */}
               <p className="mt-4 text-lg text-gray-800 leading-relaxed">
-                My approach is simple—listen carefully, advise honestly, and recommend only what truly fits your needs. No pressure. No sales theatrics.
+                <b>What sets me apart?</b> I believe property decisions should be based on what's right for you, not what's convenient for me. I take time to understand your lifestyle, budget, and long-term goals before suggesting any property.
+              </p>
+
+              {/* Additional paragraph */}
+              <p className="mt-4 text-lg text-gray-800 leading-relaxed">
+                Whether you're looking for a cozy 2 BHK to start your family journey, a luxury villa for your forever home, or a strategic investment that builds wealth over time, I <b>bring deep market knowledge</b>, strong builder relationships, and a genuine commitment to your success.
               </p>
 
             </div>
@@ -136,7 +141,7 @@ export default function About() {
               Reach out and let us chat about your property goals.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <a href={`https://wa.me/${WHATSAPP_NUMBER}?text=Hi Vibha, I am interested in a property`}>
+              <a href={`https://wa.me/${WHATSAPP_NUMBER}?text=Hi Charushila, I am interested in a property`}>
                 <Button variant="outline" size="lg" className="group">
                   <Image src="/whatsapp.svg" alt="WhatsApp" width={20} height={20} className="group-hover:hidden" />
                   <Image src="/whatsapp_green.svg" alt="WhatsApp" width={20} height={20} className="hidden group-hover:inline-block" />

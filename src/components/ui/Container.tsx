@@ -14,11 +14,11 @@ export function Container({
   return (
     <div
       className={clsx(
-        "w-full mx-auto px-4 sm:px-4 lg:px-4",
+        "w-full mx-auto px-4 sm:px-6 lg:px-8",
         {
           "max-w-sm": maxWidth === "sm",
           "max-w-2xl": maxWidth === "md",
-          "max-w-4xl": maxWidth === "lg",
+          "max-w-7xl": maxWidth === "lg",
           "max-w-6xl": maxWidth === "xl",
           "max-w-full": maxWidth === "full",
         },

@@ -4,6 +4,7 @@ import { Phone, Mail } from "lucide-react";
 import Image from "next/image";
 
 const WHATSAPP_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "919876543210";
+const EMAIL = process.env.NEXT_PUBLIC_EMAIL || "vibha.realties@gmail.com";
 
 export default function Contact() {
   return (
@@ -17,36 +18,6 @@ export default function Contact() {
             <p className="text-xl text-gray-700 text-center mb-12">
               Have questions? Ready to find your perfect property? Reach out and let us chat!
             </p>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-              <div className="text-center">
-                <div className="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Image src="/whatsapp.svg" alt="WhatsApp" width={32} height={32} />
-                </div>
-                <h3 className="font-bold text-gray-900 mb-2">WhatsApp</h3>
-                <a href={`https://wa.me/${WHATSAPP_NUMBER}`} className="text-green-600 font-semibold">
-                  Message Now
-                </a>
-              </div>
-
-              <div className="text-center">
-                <div className="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Phone className="text-blue-600" size={32} />
-                </div>
-                <h3 className="font-bold text-gray-900 mb-2">Phone</h3>
-                <a href={`tel:+${WHATSAPP_NUMBER}`} className="text-blue-600 font-semibold">
-                  Call Directly
-                </a>
-              </div>
-
-              <div className="text-center">
-                <div className="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Mail className="text-purple-600" size={32} />
-                </div>
-                <h3 className="font-bold text-gray-900 mb-2">24/7 Available</h3>
-                <p className="text-gray-600">Always ready to help</p>
-              </div>
-            </div>
 
             <div className="bg-gray-50 border border-gray-200 rounded-lg p-8 md:p-12">
               <h2 className="text-2xl font-bold text-gray-900 mb-2">Quick Enquiry Form</h2>

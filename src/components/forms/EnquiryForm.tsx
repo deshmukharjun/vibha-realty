@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { openWhatsApp, createWhatsAppMessage } from "@/lib/whatsapp";
+import { addEnquiry } from "@/hooks/useCMS";
 import Image from "next/image";
 
 interface EnquiryFormProps {
@@ -18,26 +19,60 @@ export function EnquiryForm({ areas = [], whatsappNumber }: EnquiryFormProps) {
     area: "",
   });
   const [loading, setLoading] = useState(false);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmitToBackend = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!formData.name || !formData.phone) {
+      return;
+    }
+
     setLoading(true);
+    setSubmitSuccess(false);
 
     try {
-      // Store enquiry (if backend is ready)
-      // For now, we'll just redirect to WhatsApp
-      const message = createWhatsAppMessage(
-        formData.name,
-        formData.requirement,
-        formData.area
-      );
-
-      openWhatsApp(whatsappNumber, message);
+      await addEnquiry({
+        name: formData.name,
+        phone: formData.phone,
+        requirement: formData.requirement as 'buy' | 'rent' | 'invest',
+        area: formData.area,
+      });
+      
+      setSubmitSuccess(true);
+      // Reset form after successful submission
+      setTimeout(() => {
+        setFormData({
+          name: "",
+          phone: "",
+          requirement: "buy",
+          area: "",
+        });
+        setSubmitSuccess(false);
+      }, 3000);
     } catch (error) {
       console.error("Error submitting enquiry:", error);
+      alert("Failed to submit enquiry. Please try again.");
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleSendWhatsApp = (e: React.MouseEvent) => {
+    e.preventDefault();
+    
+    if (!formData.name || !formData.phone) {
+      alert("Please fill in your name and phone number first.");
+      return;
+    }
+
+    const message = createWhatsAppMessage(
+      formData.name,
+      formData.requirement,
+      formData.area
+    );
+
+    openWhatsApp(whatsappNumber, message);
   };
 
   const handleChange = (
@@ -51,7 +86,7 @@ export function EnquiryForm({ areas = [], whatsappNumber }: EnquiryFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmitToBackend} className="space-y-4">
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
           Full Name
@@ -120,20 +155,34 @@ export function EnquiryForm({ areas = [], whatsappNumber }: EnquiryFormProps) {
         </div>
       )}
 
-      <Button
-        type="submit"
-        variant="primary"
-        size="md"
-        fullWidth
-        disabled={loading}
-        className="gap-2"
-      >
-        <Image src="/whatsapp.svg" alt="WhatsApp" width={18} height={18} />
-        {loading ? "Connecting..." : "Get Details on WhatsApp"}
-      </Button>
+      <div className="flex flex-col gap-3">
+        <Button
+          type="submit"
+          variant="primary"
+          size="md"
+          fullWidth
+          disabled={loading}
+        >
+          {loading ? "Submitting..." : submitSuccess ? "✓ Submitted Successfully!" : "Submit Enquiry"}
+        </Button>
+
+        <Button
+          type="button"
+          variant="outlineLight"
+          size="md"
+          fullWidth
+          onClick={handleSendWhatsApp}
+          className="gap-2"
+        >
+          <Image src="/whatsapp_green.svg" alt="WhatsApp" width={18} height={18} />
+          Send Enquiry on WhatsApp
+        </Button>
+      </div>
 
       <p className="text-xs text-gray-700 text-center">
-        We'll connect with you on WhatsApp within minutes
+        {submitSuccess 
+          ? "Your enquiry has been submitted! We'll contact you soon." 
+          : "Submit to save your enquiry or send directly on WhatsApp"}
       </p>
     </form>
   );
