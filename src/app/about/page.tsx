@@ -16,6 +16,8 @@ export default function About() {
           alt="Background"
           fill
           priority
+          quality={85}
+          sizes="100vw"
           className="object-cover opacity-100 pointer-events-none select-none"
         />
         <div className="absolute inset-0 bg-gradient-to-br opacity-70 from-green-50/100 via-white/90 to-green-50/100" />

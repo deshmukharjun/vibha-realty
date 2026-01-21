@@ -53,9 +53,11 @@ service cloud.firestore {
       allow create, update, delete: if isAuthenticated();
     }
     
-    // Enquiries - only authenticated users can read/write
+    // Enquiries - anyone can create (for public forms), only authenticated users can read
     match /enquiries/{enquiryId} {
-      allow read, write: if isAuthenticated();
+      allow create: if true; // Anyone can create enquiries
+      allow read: if isAuthenticated(); // Only authenticated users can read
+      allow update, delete: if isAuthenticated(); // Only authenticated users can update/delete
     }
   }
 }
@@ -139,7 +141,8 @@ service cloud.firestore {
     }
     
     match /enquiries/{enquiryId} {
-      allow read, write: if isAdmin();
+      allow create: if true; // Anyone can create enquiries (public forms)
+      allow read, update, delete: if isAdmin(); // Only admins can read/update/delete
     }
   }
 }

@@ -11,9 +11,21 @@ interface EnquiryFormProps {
   whatsappNumber: string;
 }
 
+const COUNTRY_CODES = [
+  { code: "+91", country: "India", flag: "🇮🇳" },
+  { code: "+1", country: "USA/Canada", flag: "🇺🇸" },
+  { code: "+44", country: "UK", flag: "🇬🇧" },
+  { code: "+971", country: "UAE", flag: "🇦🇪" },
+  { code: "+61", country: "Australia", flag: "🇦🇺" },
+  { code: "+65", country: "Singapore", flag: "🇸🇬" },
+  { code: "+60", country: "Malaysia", flag: "🇲🇾" },
+  { code: "+66", country: "Thailand", flag: "🇹🇭" },
+];
+
 export function EnquiryForm({ areas = [], whatsappNumber }: EnquiryFormProps) {
   const [formData, setFormData] = useState({
     name: "",
+    countryCode: "+91",
     phone: "",
     requirement: "buy",
     area: "",
@@ -32,9 +44,11 @@ export function EnquiryForm({ areas = [], whatsappNumber }: EnquiryFormProps) {
     setSubmitSuccess(false);
 
     try {
+      // Combine country code with phone number
+      const fullPhone = formData.countryCode + formData.phone;
       await addEnquiry({
         name: formData.name,
-        phone: formData.phone,
+        phone: fullPhone,
         requirement: formData.requirement as 'buy' | 'rent' | 'invest',
         area: formData.area,
       });
@@ -44,6 +58,7 @@ export function EnquiryForm({ areas = [], whatsappNumber }: EnquiryFormProps) {
       setTimeout(() => {
         setFormData({
           name: "",
+          countryCode: "+91",
           phone: "",
           requirement: "buy",
           area: "",
@@ -106,16 +121,30 @@ export function EnquiryForm({ areas = [], whatsappNumber }: EnquiryFormProps) {
         <label className="block text-sm font-medium text-gray-700 mb-2">
           Phone Number
         </label>
-        <input
-          type="tel"
-          name="phone"
-          value={formData.phone}
-          onChange={handleChange}
-          required
-          placeholder="10-digit number"
-          pattern="[0-9]{10}"
-          className="w-full px-4 py-2 border border-gray-300 text-black rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 placeholder:text-gray-500"
-        />
+        <div className="flex gap-2">
+          <select
+            name="countryCode"
+            value={formData.countryCode}
+            onChange={handleChange}
+            className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-black bg-white"
+          >
+            {COUNTRY_CODES.map((cc) => (
+              <option key={cc.code} value={cc.code}>
+                {cc.flag} {cc.code}
+              </option>
+            ))}
+          </select>
+          <input
+            type="tel"
+            name="phone"
+            value={formData.phone}
+            onChange={handleChange}
+            required
+            placeholder={formData.countryCode === "+91" ? "10-digit number" : "Phone number"}
+            pattern={formData.countryCode === "+91" ? "[0-9]{10}" : undefined}
+            className="flex-1 px-4 py-2 border border-gray-300 text-black rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 placeholder:text-gray-500"
+          />
+        </div>
       </div>
 
       <div>
