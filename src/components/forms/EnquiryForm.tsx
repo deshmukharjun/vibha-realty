@@ -65,9 +65,14 @@ export function EnquiryForm({ areas = [], whatsappNumber }: EnquiryFormProps) {
         });
         setSubmitSuccess(false);
       }, 3000);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error submitting enquiry:", error);
-      alert("Failed to submit enquiry. Please try again.");
+      // Check if it's a permission error
+      if (error?.code === 'permission-denied' || error?.message?.includes('permission')) {
+        alert("Permission denied. Please contact the administrator. The Firestore rules need to be updated to allow public enquiry creation.");
+      } else {
+        alert(`Failed to submit enquiry: ${error?.message || 'Please try again.'}`);
+      }
     } finally {
       setLoading(false);
     }
@@ -126,7 +131,7 @@ export function EnquiryForm({ areas = [], whatsappNumber }: EnquiryFormProps) {
             name="countryCode"
             value={formData.countryCode}
             onChange={handleChange}
-            className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-black bg-white"
+            className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-gray-700 bg-transparent"
           >
             {COUNTRY_CODES.map((cc) => (
               <option key={cc.code} value={cc.code}>
