@@ -222,18 +222,19 @@ export default function BlogEditor({ params }: Props) {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Area</label>
-              <select
+              <input
+                type="text"
+                list="area-list-blog"
                 value={formData.area}
                 onChange={(e) => setFormData((prev) => ({ ...prev, area: e.target.value }))}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-black"
-              >
-                <option value="">Select an area</option>
+                placeholder="Type or select an area (e.g., Baner, Wakad, Aundh)"
+              />
+              <datalist id="area-list-blog">
                 {areas.map((area) => (
-                  <option key={area.id} value={area.name}>
-                    {area.name}
-                  </option>
+                  <option key={area.id} value={area.name} />
                 ))}
-              </select>
+              </datalist>
             </div>
           </div>
 
