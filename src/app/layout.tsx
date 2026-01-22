@@ -4,6 +4,7 @@ import "./globals.css";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { StickyHeader, StickyButtonsDesktop } from "@/components/layout/StickyButtons";
+import { PageLoader } from "@/components/PageLoader";
 import Image from "next/image";
 
 const inter = Inter({
@@ -45,6 +46,7 @@ export default function RootLayout({
         <link rel="icon" href="/logo.svg" type="image/svg+xml" />
       </head>
       <body className={`${inter.variable} font-sans antialiased bg-white`} suppressHydrationWarning>
+        <PageLoader />
         <Header whatsappNumber={WHATSAPP_NUMBER} />
         <main className="pb-24 md:pb-0">
           {children}
