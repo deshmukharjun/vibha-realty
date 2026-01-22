@@ -34,7 +34,7 @@ export default function Home() {
                 Your Dream Property in Pune Starts Here
               </h1>
               <p className="text-lg text-gray-700 mb-4">
-                With 12+ years of expertise, I've helped over 420 families find their perfect home and guided investors to properties that deliver real returns. No pressure, just honest guidance tailored to your needs.
+                With 10+ years of expertise, I've helped over 365 families find their perfect home and guided investors to properties that deliver real returns. No pressure, just honest guidance tailored to your needs.
               </p>
               <p className="text-lg text-gray-700 mb-8">
                 From premium apartments in Baner to investment opportunities in Wakad, I know Pune's real estate market inside out. Let's find the property that fits your lifestyle, budget, and future goals.
@@ -44,13 +44,13 @@ export default function Home() {
               <div className="grid grid-cols-3 gap-4 mb-8">
                 <div className="text-center">
                   <div className="text-3xl font-bold text-green-600 mb-2">
-                    <CountUpNumber end={12} suffix="+" />
+                    <CountUpNumber end={10} suffix="+" />
                   </div>
                   <p className="text-sm text-gray-700">Years of Trust</p>
                 </div>
                 <div className="text-center">
                   <div className="text-3xl font-bold text-green-600 mb-2">
-                    <CountUpNumber end={420} suffix="+" />
+                    <CountUpNumber end={365} suffix="+" />
                   </div>
                   <p className="text-sm text-gray-700">Families Helped</p>
                 </div>

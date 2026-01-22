@@ -72,8 +72,10 @@ export function Footer() {
 
         <div className="border-t border-gray-800 py-6 text-center text-sm">
           <p>
-            &copy; {currentYear} Charushila Bhalerao. All rights reserved. | Privacy
-            Policy
+            &copy; {currentYear} Charushila Bhalerao. All rights reserved. |{" "}
+            <Link href="/privacy-policy" className="hover:text-green-400">
+              Privacy Policy
+            </Link>
           </p>
         </div>
       </Container>
