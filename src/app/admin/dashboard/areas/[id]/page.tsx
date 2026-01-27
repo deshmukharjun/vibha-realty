@@ -19,6 +19,7 @@ export default function AreaEditor({ params }: Props) {
     name: '',
     shortDescription: '',
     fullDescription: '',
+    whatsappBroadcastLink: '',
   })
 
   const [loading, setLoading] = useState(false)
@@ -36,6 +37,7 @@ export default function AreaEditor({ params }: Props) {
               name: area.name,
               shortDescription: area.shortDescription,
               fullDescription: area.fullDescription,
+              whatsappBroadcastLink: area.whatsappBroadcastLink ?? '',
             })
           } else {
             setError('Area not found')
@@ -56,10 +58,16 @@ export default function AreaEditor({ params }: Props) {
     setLoading(true)
 
     try {
+      const payload = {
+        name: formData.name,
+        shortDescription: formData.shortDescription,
+        fullDescription: formData.fullDescription,
+        whatsappBroadcastLink: formData.whatsappBroadcastLink.trim() || undefined,
+      }
       if (isEditMode && id) {
-        await updateArea(id, formData)
+        await updateArea(id, payload)
       } else {
-        await addArea(formData)
+        await addArea(payload)
       }
 
       router.push('/admin/dashboard/areas')
@@ -129,6 +137,20 @@ export default function AreaEditor({ params }: Props) {
               placeholder="Detailed description about the area"
               required
             />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">WhatsApp broadcast link (optional)</label>
+            <input
+              type="url"
+              value={formData.whatsappBroadcastLink}
+              onChange={(e) => setFormData((prev) => ({ ...prev, whatsappBroadcastLink: e.target.value }))}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600 text-black"
+              placeholder="https://wa.me/group/xxx or wa.me chat link for this area"
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              When set, the Areas card links to this URL. Leave empty to use the default &quot;Hi Charushila, I&apos;m interested in [area]&quot; chat.
+            </p>
           </div>
         </div>
 

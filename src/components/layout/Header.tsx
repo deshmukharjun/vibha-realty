@@ -1,33 +1,78 @@
- 'use client'
+'use client'
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { Container } from "@/components/ui/Container";
+import { SmoothScrollLink } from "@/components/SmoothScrollLink";
 import { Menu, X } from "lucide-react";
+
+type SectionId = "about" | "areas" | "testimonials";
 
 interface HeaderProps {
   whatsappNumber: string;
 }
 
+const SECTION_IDS: SectionId[] = ["about", "areas", "testimonials"];
+const ACTIVE_LINE_OFFSET = 120;
+
 export function Header({ whatsappNumber }: HeaderProps) {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState<SectionId | null>(null);
 
-  const isActive = (href: string) => {
-    if (href === "/") return pathname === "/";
-    return pathname.startsWith(href);
-  };
+  useEffect(() => {
+    if (pathname !== "/") return;
+    const updateActive = () => {
+      for (const id of SECTION_IDS) {
+        const el = document.getElementById(id);
+        if (!el) continue;
+        const { top, bottom } = el.getBoundingClientRect();
+        if (top <= ACTIVE_LINE_OFFSET && bottom >= ACTIVE_LINE_OFFSET) {
+          setActiveSection(id);
+          return;
+        }
+      }
+      setActiveSection(null);
+    };
+    updateActive();
+    window.addEventListener("scroll", updateActive, { passive: true });
+    window.addEventListener("resize", updateActive);
+    return () => {
+      window.removeEventListener("scroll", updateActive);
+      window.removeEventListener("resize", updateActive);
+    };
+  }, [pathname]);
 
   const linkBaseClasses = "font-medium transition-colors duration-150";
+  const activeClasses = "text-green-700 font-semibold";
+  const inactiveClasses = "text-gray-700 hover:text-green-600";
 
-  const linkClasses = (href: string) =>
-    `${linkBaseClasses} ${
-      isActive(href)
-        ? "text-green-700 font-semibold"
-        : "text-gray-700 hover:text-green-600"
-    }`;
+  const isNavActive = (item: "home" | SectionId) => {
+    if (pathname !== "/") return item === "home" && pathname === "/";
+    if (item === "home") return activeSection === null;
+    return activeSection === item;
+  };
+
+  const navLinkClasses = (item: "home" | SectionId) =>
+    `${linkBaseClasses} ${isNavActive(item) ? activeClasses : inactiveClasses}`;
+
+  const handleHomeClick = useCallback(
+    async (e: React.MouseEvent<HTMLAnchorElement>) => {
+      if (pathname !== "/") return;
+      e.preventDefault();
+      const { gsap } = await import("gsap");
+      const { ScrollToPlugin } = await import("gsap/ScrollToPlugin");
+      gsap.registerPlugin(ScrollToPlugin);
+      gsap.to(window, {
+        duration: 1.2,
+        scrollTo: 0,
+        ease: "power2.inOut",
+      });
+    },
+    [pathname]
+  );
 
   return (
     <header className="bg-white border-b border-gray-200 sticky top-0 z-30">
@@ -51,21 +96,18 @@ export function Header({ whatsappNumber }: HeaderProps) {
 
           {/* Desktop nav */}
           <nav className="hidden md:flex items-center gap-8">
-            <Link href="/" className={linkClasses("/")}>
+            <Link href="/" className={navLinkClasses("home")} onClick={handleHomeClick}>
               Home
             </Link>
-            <Link href="/#about" className={linkBaseClasses + " text-gray-700 hover:text-green-600"}>
+            <SmoothScrollLink href="/#about" className={navLinkClasses("about")}>
               About
-            </Link>
-            <Link href="/#projects" className={linkBaseClasses + " text-gray-700 hover:text-green-600"}>
-              Projects
-            </Link>
-            <Link href="/#areas" className={linkBaseClasses + " text-gray-700 hover:text-green-600"}>
+            </SmoothScrollLink>
+            <SmoothScrollLink href="/#areas" className={navLinkClasses("areas")}>
               Areas
-            </Link>
-            <Link href="/#testimonials" className={linkBaseClasses + " text-gray-700 hover:text-green-600"}>
+            </SmoothScrollLink>
+            <SmoothScrollLink href="/#testimonials" className={navLinkClasses("testimonials")}>
               Testimonials
-            </Link>
+            </SmoothScrollLink>
           </nav>
 
           {/* Mobile hamburger */}
@@ -86,47 +128,41 @@ export function Header({ whatsappNumber }: HeaderProps) {
               <li>
                 <Link
                   href="/"
-                  className={`${linkClasses("/")} block px-1 py-1.5`}
-                  onClick={() => setMobileOpen(false)}
+                  className={`${navLinkClasses("home")} block px-1 py-1.5`}
+                  onClick={(e) => {
+                    handleHomeClick(e);
+                    setMobileOpen(false);
+                  }}
                 >
                   Home
                 </Link>
               </li>
               <li>
-                <Link
+                <SmoothScrollLink
                   href="/#about"
-                  className={`${linkBaseClasses} text-gray-700 hover:text-green-600 block px-1 py-1.5`}
+                  className={`${navLinkClasses("about")} block px-1 py-1.5`}
                   onClick={() => setMobileOpen(false)}
                 >
                   About
-                </Link>
+                </SmoothScrollLink>
               </li>
               <li>
-                <Link
-                  href="/#projects"
-                  className={`${linkBaseClasses} text-gray-700 hover:text-green-600 block px-1 py-1.5`}
-                  onClick={() => setMobileOpen(false)}
-                >
-                  Projects
-                </Link>
-              </li>
-              <li>
-                <Link
+                <SmoothScrollLink
                   href="/#areas"
-                  className={`${linkBaseClasses} text-gray-700 hover:text-green-600 block px-1 py-1.5`}
+                  className={`${navLinkClasses("areas")} block px-1 py-1.5`}
                   onClick={() => setMobileOpen(false)}
                 >
                   Areas
-                </Link>
+                </SmoothScrollLink>
               </li>
               <li>
-                <Link
+                <SmoothScrollLink
                   href="/#testimonials"
-                  className={`${linkBaseClasses} text-gray-700 hover:text-green-600 block px-1 py-1.5`}
+                  className={`${navLinkClasses("testimonials")} block px-1 py-1.5`}
                   onClick={() => setMobileOpen(false)}
                 >
                   Testimonials
-                </Link>
+                </SmoothScrollLink>
               </li>
             </ul>
           </nav>

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { addTestimonial, updateTestimonial, getTestimonial } from '@/hooks/useCMS'
 import { useAreas } from '@/hooks/useCMS'
 import Link from 'next/link'
-import type { Testimonial } from '@/types/cms'
+import type { Testimonial, TestimonialStatus } from '@/types/cms'
 
 interface Props {
   params: Promise<{ id?: string }>
@@ -17,12 +17,20 @@ export default function TestimonialEditor({ params }: Props) {
   const { id } = use(params)
   const isEditMode = id && id !== 'new'
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    clientName: string
+    area: string
+    testimonial: string
+    rating: number
+    image: string
+    status: TestimonialStatus
+  }>({
     clientName: '',
     area: '',
     testimonial: '',
     rating: 5,
     image: '',
+    status: 'approved',
   })
 
   const [loading, setLoading] = useState(false)
@@ -42,6 +50,7 @@ export default function TestimonialEditor({ params }: Props) {
               testimonial: testimonial.testimonial,
               rating: testimonial.rating,
               image: testimonial.image || '',
+              status: (testimonial.status ?? 'approved') as TestimonialStatus,
             })
           } else {
             setError('Testimonial not found')
@@ -68,10 +77,18 @@ export default function TestimonialEditor({ params }: Props) {
     }
 
     try {
+      const payload = {
+        clientName: formData.clientName,
+        area: formData.area,
+        testimonial: formData.testimonial,
+        rating: formData.rating,
+        image: formData.image || undefined,
+        status: formData.status,
+      }
       if (isEditMode && id) {
-        await updateTestimonial(id, formData)
+        await updateTestimonial(id, payload)
       } else {
-        await addTestimonial(formData)
+        await addTestimonial(payload)
       }
 
       router.push('/admin/dashboard/testimonials')
@@ -148,6 +165,19 @@ export default function TestimonialEditor({ params }: Props) {
               placeholder="Client's testimonial text"
               required
             />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+            <select
+              value={formData.status}
+              onChange={(e) => setFormData((prev) => ({ ...prev, status: e.target.value as TestimonialStatus }))}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-600 text-black"
+            >
+              <option value="pending">Pending</option>
+              <option value="approved">Approved</option>
+            </select>
+            <p className="text-xs text-gray-500 mt-1">Only approved testimonials appear on the public site.</p>
           </div>
 
           <div>

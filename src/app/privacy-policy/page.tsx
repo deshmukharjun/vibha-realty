@@ -108,11 +108,8 @@ export default function PrivacyPolicy() {
               </h2>
               <p>You have the right to:</p>
               <ul className="list-disc pl-6 space-y-2">
-                <li>Access and receive a copy of your personal information</li>
                 <li>Correct inaccurate or incomplete information</li>
-                <li>Request deletion of your personal information</li>
                 <li>Opt-out of marketing communications</li>
-                <li>Withdraw consent at any time</li>
               </ul>
               <p className="mt-4">
                 To exercise these rights, please contact us using the contact information provided below.

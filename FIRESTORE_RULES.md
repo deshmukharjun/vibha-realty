@@ -47,10 +47,16 @@ service cloud.firestore {
       allow create, update, delete: if isAuthenticated();
     }
     
-    // Testimonials - public read, authenticated write
+    // Testimonials - public sees only approved; unauthenticated can create pending submissions
     match /testimonials/{testimonialId} {
-      allow read: if true; // Everyone can read testimonials
-      allow create, update, delete: if isAuthenticated();
+      // Public: read only approved. Legacy docs (no status) need status:'approved' set in Firestore to appear.
+      allow read: if resource.data.get('status', 'approved') == 'approved';
+      // Authenticated (admin): read all, write all
+      allow read: if isAuthenticated();
+      // Public submission: anyone can create with status 'pending' only
+      allow create: if request.resource.data.status == 'pending'
+        || isAuthenticated();
+      allow update, delete: if isAuthenticated();
     }
     
     // Enquiries - anyone can create (for public forms), only authenticated users can read
@@ -58,6 +64,13 @@ service cloud.firestore {
       allow create: if true; // Anyone can create enquiries
       allow read: if isAuthenticated(); // Only authenticated users can read
       allow update, delete: if isAuthenticated(); // Only authenticated users can update/delete
+    }
+    
+    // Listings - public read for active listings only; authenticated write (admin)
+    match /listings/{listingId} {
+      allow read: if resource.data.adminStatus == 'active'; // Public sees only active
+      allow read: if isAuthenticated(); // Admins see all (active, sold, hidden)
+      allow create, update, delete: if isAuthenticated();
     }
   }
 }

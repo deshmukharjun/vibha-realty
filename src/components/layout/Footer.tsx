@@ -1,6 +1,7 @@
 import { Container } from "@/components/ui/Container";
 import Image from "next/image";
 import Link from "next/link";
+import { SmoothScrollLink } from "@/components/SmoothScrollLink";
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
@@ -29,24 +30,19 @@ export function Footer() {
             <h4 className="font-bold text-white mb-4">Quick Links</h4>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link href="/#about" className="hover:text-green-400">
+                <SmoothScrollLink href="/#about" className="hover:text-green-400">
                   About
-                </Link>
+                </SmoothScrollLink>
               </li>
               <li>
-                <Link href="/#projects" className="hover:text-green-400">
-                  Projects
-                </Link>
-              </li>
-              <li>
-                <Link href="/#areas" className="hover:text-green-400">
+                <SmoothScrollLink href="/#areas" className="hover:text-green-400">
                   Areas
-                </Link>
+                </SmoothScrollLink>
               </li>
               <li>
-                <Link href="/#testimonials" className="hover:text-green-400">
+                <SmoothScrollLink href="/#testimonials" className="hover:text-green-400">
                   Testimonials
-                </Link>
+                </SmoothScrollLink>
               </li>
               <li>
                 <Link href="/contact" className="hover:text-green-400">
