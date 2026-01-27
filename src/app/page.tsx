@@ -1,20 +1,80 @@
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
 import { EnquiryForm } from "@/components/forms/EnquiryForm";
-import { AnimatedAreaCards } from "@/components/AnimatedAreaCards";
+import { PartnersList } from "@/components/PartnersList";
+import { LogoCarousel } from "@/components/LogoCarousel";
+import { TestimonialsList } from "@/components/TestimonialsList";
 import { ArrowRight, Phone } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { CountUpNumber } from "@/components/ui/CountUpNumber";
+
+const AREAS = [
+  { name: "Baner", desc: "Premium locality with modern amenities and good connectivity" },
+  { name: "Wakad", desc: "Rapid growth area with excellent infrastructure and schools" },
+  { name: "Hadapsar", desc: "IT hub with commercial and residential properties" },
+  { name: "Kalyani Nagar", desc: "Upmarket area known for luxury apartments" },
+  { name: "Koregaon Park", desc: "Established locality with heritage charm" },
+  { name: "Kothrud", desc: "Central location with vibrant community" },
+  { name: "Viman Nagar", desc: "Residential area near airport with good returns" },
+  { name: "Pune City", desc: "CBD area with commercial and premium residential" },
+];
 
 const WHATSAPP_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "919876543210";
 
 export default function Home() {
   return (
     <>
-      {/* Hero Section */}
+      {/* About Me – Hero (first section) */}
+      <section id="about" className="relative py-20 md:py-28 overflow-hidden scroll-mt-20">
+        <Image
+          src="/bgabout.jpg"
+          alt=""
+          fill
+          priority
+          quality={85}
+          sizes="100vw"
+          className="object-cover opacity-100 pointer-events-none select-none"
+        />
+        <div className="absolute inset-0 bg-gradient-to-br opacity-70 from-green-50/100 via-white/90 to-green-50/100" />
+        <Container maxWidth="lg">
+          <div className="relative grid grid-cols-1 md:grid-cols-2 gap-14 items-stretch">
+            <div className="order-2 md:order-1 relative h-full min-h-[500px] md:min-h-[600px]">
+              <Image
+                src="/headshot.jpeg"
+                alt="Charushila Bhalerao – Pune Real Estate Consultant"
+                fill
+                className="rounded-2xl object-cover shadow-[0_20px_40px_rgba(0,0,0,0.12)]"
+              />
+            </div>
+            <div className="order-1 md:order-2 bg-white/10 backdrop-blur-xs border-2 border-white/40 p-6 rounded-xl shadow-xl">
+              <h1 className="text-3xl md:text-4xl font-semibold text-gray-900 leading-tight">
+                Hi, I&apos;m Charushila Bhalerao
+              </h1>
+              <h2 className="mt-2 text-xl md:text-2xl font-medium text-gray-600">
+                10+ Years of Trusted Real Estate Expertise in Pune, Maharashtra
+              </h2>
+              <div className="mt-5 flex flex-wrap gap-3 text-sm text-gray-600">
+                <span className="px-3 py-1 border border-gray-200 rounded-full">Residential & Investment</span>
+                <span className="px-3 py-1 border border-gray-200 rounded-full">Pune Specialist</span>
+                <span className="px-3 py-1 border border-gray-200 rounded-full">Client-First Approach</span>
+              </div>
+              <p className="mt-6 text-md text-gray-800 leading-relaxed">
+                Over the last <b>10+ years</b>, I&apos;ve helped over <b>365 families</b> find their dream homes in Pune&apos;s most sought-after neighborhoods. From first-time buyers in Baner to seasoned investors in Wakad.
+              </p>
+              <p className="mt-4 text-md text-gray-800 leading-relaxed">
+                <b>What sets me apart?</b> I believe property decisions should be based on what&apos;s right for you, not what&apos;s convenient for me. I take time to understand your lifestyle, budget, and long-term goals before suggesting any property.
+              </p>
+              <p className="mt-4 text-md text-gray-800 leading-relaxed">
+                Whether you&apos;re looking for a 2 BHK, a luxury villa, or a strategic investment, I <b>bring deep market knowledge</b>, strong builder relationships, and a genuine commitment to your success.
+              </p>
+            </div>
+          </div>
+        </Container>
+      </section>
+
+      {/* Property Search Hero (second section) */}
       <section className="relative py-16 md:py-24 overflow-hidden">
-        {/* Background image with soft overlay */}
         <Image
           src="/bgl.jpg"
           alt="Pune city skyline"
@@ -70,10 +130,10 @@ export default function Home() {
                     Let's Talk
                   </Button>
                 </Link>
-                <Link href="/about" className="flex items-center gap-2 text-gray-700 hover:text-green-600 transition-colors group">
+                <a href="#about" className="flex items-center gap-2 text-gray-700 hover:text-green-600 transition-colors group">
                   <span className="text-base font-medium">Know more about me</span>
                   <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
-                </Link>
+                </a>
               </div>
             </div>
 
@@ -275,17 +335,119 @@ export default function Home() {
         </Container>
       </section>
 
-      {/* Areas Served */}
-      <section className="py-16 md:py-24 bg-gray-50">
+      {/* Areas – full section */}
+      <section id="areas" className="scroll-mt-20 py-16 md:py-24 bg-white">
         <Container>
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 text-center">
-            Areas I Serve in Pune
+          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 text-center">
+            Areas of Operation
           </h2>
-          <p className="text-center text-gray-700 mb-4">
-            Expertise across all major localities
+          <p className="text-xl text-gray-700 mb-12 text-center">
+            I specialize in all major areas of Pune. Each area has unique characteristics and investment potential.
           </p>
 
-          <AnimatedAreaCards />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
+            {AREAS.map((area) => (
+              <div key={area.name} className="bg-gray-50 border border-gray-200 rounded-lg p-8">
+                <h3 className="text-2xl font-bold text-gray-900 mb-3">{area.name}</h3>
+                <p className="text-gray-700 mb-6">{area.desc}</p>
+                <a
+                  href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(`Hi Charushila, I'm interested in ${area.name}. Would love to hear your recommendations.`)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center gap-2 w-full font-semibold rounded-lg bg-green-600 text-white hover:bg-green-700 px-4 py-2 text-sm transition-all duration-200"
+                >
+                  <Image src="/whatsapp.svg" alt="WhatsApp" width={16} height={16} />
+                  Enquire About {area.name}
+                </a>
+              </div>
+            ))}
+          </div>
+
+          <div className="bg-green-600 text-white rounded-xl p-8 md:p-12 text-center">
+            <h3 className="text-2xl font-bold mb-4">Confused About Which Area?</h3>
+            <p className="text-green-100 mb-6">
+              Tell me your budget and requirements. I will suggest the best areas for you.
+            </p>
+            <a
+              href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent("Hi Charushila, I'd love your guidance on which areas would work best for my budget and needs.")}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-2 font-semibold rounded-lg border-2 border-white text-white hover:bg-white hover:text-green-600 px-8 py-4 text-lg transition-all duration-200 group"
+            >
+              <Image src="/whatsapp.svg" alt="WhatsApp" width={20} height={20} className="group-hover:hidden" />
+              <Image src="/whatsapp_green.svg" alt="WhatsApp" width={20} height={20} className="hidden group-hover:inline-block" />
+              Get Personalized Suggestions
+            </a>
+          </div>
+        </Container>
+      </section>
+
+      {/* Projects & Channel Partners */}
+      <section id="projects" className="scroll-mt-20 py-16 md:py-24 bg-gray-50">
+        <Container>
+          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+            Projects & Channel Partners
+          </h2>
+          <p className="text-xl text-gray-700 mb-12">
+            I work with leading builders and developers across Pune. Here are some of the major projects.
+          </p>
+
+          <div className="mb-16 md:mb-20 w-full">
+            <p className="text-center text-sm font-medium text-gray-500 uppercase tracking-wider mb-8">
+              Trusted by Pune&apos;s leading names
+            </p>
+            <div className="w-full overflow-hidden -mx-4 sm:-mx-6 lg:-mx-8">
+              <LogoCarousel />
+            </div>
+          </div>
+
+          <PartnersList />
+        </Container>
+      </section>
+
+      <section className="py-16 md:py-24 bg-white">
+        <Container>
+          <div className="bg-gray-50 p-8 md:p-12 rounded-lg border border-gray-200 text-center">
+            <h3 className="text-2xl font-bold text-gray-900 mb-4">Looking for a Specific Property?</h3>
+            <p className="text-gray-600 mb-6">
+              I have access to properties from all major builders and can help you find exactly what you are looking for.
+            </p>
+            <div className="flex justify-center">
+              <Link href="/contact">
+                <Button variant="primary" size="md">
+                  <Image src="/whatsapp.svg" alt="WhatsApp" width={20} height={20} />
+                  Send Enquiry
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </Container>
+      </section>
+
+      {/* Testimonials */}
+      <section id="testimonials" className="scroll-mt-20 py-16 md:py-24 bg-gray-50">
+        <Container>
+          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+            Happy Clients
+          </h2>
+          <p className="text-xl text-gray-700 mb-12">
+            Read what my clients have to say about their experience.
+          </p>
+
+          <TestimonialsList />
+        </Container>
+      </section>
+
+      <section className="py-16 md:py-24 bg-white">
+        <Container>
+          <div className="text-center">
+            <h3 className="text-3xl font-bold text-gray-900 mb-4">
+              Join Hundreds of Happy Customers
+            </h3>
+            <p className="text-lg text-gray-700">
+              Start your property journey with me today.
+            </p>
+          </div>
         </Container>
       </section>
 

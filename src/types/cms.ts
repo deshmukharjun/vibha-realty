@@ -1,20 +1,3 @@
-export interface BlogPost {
-  id: string
-  title: string
-  slug: string
-  excerpt: string
-  content: string
-  category: 'residential-updates' | 'investment-guide' | 'commercial-insights' | 'market-trends'
-  area: string
-  publishedAt: string
-  readingTime: number
-  author: string
-  featured: boolean
-  createdAt: string
-  updatedAt: string
-  status: 'draft' | 'published'
-}
-
 export interface Area {
   id: string
   name: string

@@ -54,12 +54,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             📊 Dashboard
           </Link>
           <Link
-            href="/admin/dashboard/blogs"
-            className="block px-6 py-3 hover:bg-gray-800 transition"
-          >
-            📝 Blog Posts
-          </Link>
-          <Link
             href="/admin/dashboard/areas"
             className="block px-6 py-3 hover:bg-gray-800 transition"
           >

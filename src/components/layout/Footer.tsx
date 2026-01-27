@@ -29,18 +29,23 @@ export function Footer() {
             <h4 className="font-bold text-white mb-4">Quick Links</h4>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link href="/about" className="hover:text-green-400">
+                <Link href="/#about" className="hover:text-green-400">
                   About
                 </Link>
               </li>
               <li>
-                <Link href="/projects" className="hover:text-green-400">
+                <Link href="/#projects" className="hover:text-green-400">
                   Projects
                 </Link>
               </li>
               <li>
-                <Link href="/areas" className="hover:text-green-400">
+                <Link href="/#areas" className="hover:text-green-400">
                   Areas
+                </Link>
+              </li>
+              <li>
+                <Link href="/#testimonials" className="hover:text-green-400">
+                  Testimonials
                 </Link>
               </li>
               <li>

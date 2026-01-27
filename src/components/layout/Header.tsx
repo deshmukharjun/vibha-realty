@@ -54,19 +54,16 @@ export function Header({ whatsappNumber }: HeaderProps) {
             <Link href="/" className={linkClasses("/")}>
               Home
             </Link>
-            <Link href="/about" className={linkClasses("/about")}>
+            <Link href="/#about" className={linkBaseClasses + " text-gray-700 hover:text-green-600"}>
               About
             </Link>
-            <Link href="/projects" className={linkClasses("/projects")}>
+            <Link href="/#projects" className={linkBaseClasses + " text-gray-700 hover:text-green-600"}>
               Projects
             </Link>
-            <Link href="/areas" className={linkClasses("/areas")}>
+            <Link href="/#areas" className={linkBaseClasses + " text-gray-700 hover:text-green-600"}>
               Areas
             </Link>
-            <Link href="/blog" className={linkClasses("/blog")}>
-              Blog
-            </Link>
-            <Link href="/testimonials" className={linkClasses("/testimonials")}>
+            <Link href="/#testimonials" className={linkBaseClasses + " text-gray-700 hover:text-green-600"}>
               Testimonials
             </Link>
           </nav>
@@ -97,8 +94,8 @@ export function Header({ whatsappNumber }: HeaderProps) {
               </li>
               <li>
                 <Link
-                  href="/about"
-                  className={`${linkClasses("/about")} block px-1 py-1.5`}
+                  href="/#about"
+                  className={`${linkBaseClasses} text-gray-700 hover:text-green-600 block px-1 py-1.5`}
                   onClick={() => setMobileOpen(false)}
                 >
                   About
@@ -106,8 +103,8 @@ export function Header({ whatsappNumber }: HeaderProps) {
               </li>
               <li>
                 <Link
-                  href="/projects"
-                  className={`${linkClasses("/projects")} block px-1 py-1.5`}
+                  href="/#projects"
+                  className={`${linkBaseClasses} text-gray-700 hover:text-green-600 block px-1 py-1.5`}
                   onClick={() => setMobileOpen(false)}
                 >
                   Projects
@@ -115,8 +112,8 @@ export function Header({ whatsappNumber }: HeaderProps) {
               </li>
               <li>
                 <Link
-                  href="/areas"
-                  className={`${linkClasses("/areas")} block px-1 py-1.5`}
+                  href="/#areas"
+                  className={`${linkBaseClasses} text-gray-700 hover:text-green-600 block px-1 py-1.5`}
                   onClick={() => setMobileOpen(false)}
                 >
                   Areas
@@ -124,17 +121,8 @@ export function Header({ whatsappNumber }: HeaderProps) {
               </li>
               <li>
                 <Link
-                  href="/blog"
-                  className={`${linkClasses("/blog")} block px-1 py-1.5`}
-                  onClick={() => setMobileOpen(false)}
-                >
-                  Blog
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/testimonials"
-                  className={`${linkClasses("/testimonials")} block px-1 py-1.5`}
+                  href="/#testimonials"
+                  className={`${linkBaseClasses} text-gray-700 hover:text-green-600 block px-1 py-1.5`}
                   onClick={() => setMobileOpen(false)}
                 >
                   Testimonials

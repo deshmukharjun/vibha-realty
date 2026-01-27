@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState } from 'react'
 import {
   collection,
   query,
@@ -11,61 +11,7 @@ import {
   doc,
 } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
-import type { BlogPost, Area, ChannelPartner, Testimonial, Enquiry } from '@/types/cms'
-
-export const useBlogPosts = (onlyPublished = true) => {
-  const [posts, setPosts] = useState<BlogPost[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [refreshTrigger, setRefreshTrigger] = useState(0)
-
-  useEffect(() => {
-    const fetchPosts = async () => {
-      setLoading(true)
-      setError(null)
-      try {
-        const postsCollection = collection(db, 'blogPosts')
-        let q
-        if (onlyPublished) {
-          q = query(postsCollection, where('status', '==', 'published'))
-        } else {
-          // Fetch all posts without filter
-          q = query(postsCollection)
-        }
-        const snapshot = await getDocs(q)
-        const data = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        })) as BlogPost[]
-        
-        console.log(`Fetched ${data.length} blog posts (onlyPublished: ${onlyPublished})`)
-        
-        // Sort by publishedAt, handling potential missing dates
-        const sortedData = data.sort((a, b) => {
-          const dateA = a.publishedAt ? new Date(a.publishedAt).getTime() : 0
-          const dateB = b.publishedAt ? new Date(b.publishedAt).getTime() : 0
-          return dateB - dateA
-        })
-        
-        setPosts(sortedData)
-      } catch (err) {
-        console.error('Error fetching blog posts:', err)
-        setError(err instanceof Error ? err.message : 'Failed to fetch blog posts')
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchPosts()
-  }, [onlyPublished, refreshTrigger])
-
-  // Expose refresh function - memoized to prevent infinite loops
-  const refresh = useCallback(() => {
-    setRefreshTrigger((prev) => prev + 1)
-  }, [])
-
-  return { posts, loading, error, refresh }
-}
+import type { Area, ChannelPartner, Testimonial, Enquiry } from '@/types/cms'
 
 export const useAreas = () => {
   const [areas, setAreas] = useState<Area[]>([])
@@ -154,36 +100,6 @@ export const useTestimonials = () => {
 }
 
 // Admin functions
-export const addBlogPost = async (post: Omit<BlogPost, 'id' | 'createdAt' | 'updatedAt'>) => {
-  const now = new Date().toISOString()
-  return await addDoc(collection(db, 'blogPosts'), {
-    ...post,
-    createdAt: now,
-    updatedAt: now,
-  })
-}
-
-export const updateBlogPost = async (id: string, updates: Partial<BlogPost>) => {
-  const docRef = doc(db, 'blogPosts', id)
-  return await updateDoc(docRef, {
-    ...updates,
-    updatedAt: new Date().toISOString(),
-  })
-}
-
-export const deleteBlogPost = async (id: string) => {
-  return await deleteDoc(doc(db, 'blogPosts', id))
-}
-
-export const getBlogPost = async (id: string): Promise<BlogPost | null> => {
-  const docRef = doc(db, 'blogPosts', id)
-  const docSnap = await getDoc(docRef)
-  if (docSnap.exists()) {
-    return { id: docSnap.id, ...docSnap.data() } as BlogPost
-  }
-  return null
-}
-
 export const addArea = async (area: Omit<Area, 'id' | 'createdAt' | 'updatedAt'>) => {
   const now = new Date().toISOString()
   return await addDoc(collection(db, 'areas'), {
