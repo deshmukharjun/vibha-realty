@@ -35,7 +35,7 @@ export default function Home() {
               </h1>
               <p className="text-lg text-gray-700 mb-4">
                 With 10+ years of expertise, I've helped over 365 families find their perfect home and guided investors to properties that deliver real returns. No pressure, just honest guidance tailored to your needs.
-              </p>
+              </p> 
               <p className="text-lg text-gray-700 mb-8">
                 From premium apartments in Baner to investment opportunities in Wakad, I know Pune's real estate market inside out. Let's find the property that fits your lifestyle, budget, and future goals.
               </p>

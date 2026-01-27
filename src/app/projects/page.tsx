@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/Button";
 import Image from "next/image";
 import Link from "next/link";
 import { PartnersList } from "@/components/PartnersList";
+import { LogoCarousel } from "@/components/LogoCarousel";
 
 export default function Projects() {
   return (
@@ -15,6 +16,15 @@ export default function Projects() {
           <p className="text-xl text-gray-700 mb-12">
             I work with leading builders and developers across Pune. Here are some of the major projects.
           </p>
+
+          <div className="mb-16 md:mb-20 w-full">
+            <p className="text-center text-sm font-medium text-gray-500 uppercase tracking-wider mb-8">
+              Trusted by Pune&apos;s leading names
+            </p>
+            <div className="w-full overflow-hidden -mx-4 sm:-mx-6 lg:-mx-8">
+              <LogoCarousel />
+            </div>
+          </div>
 
           <PartnersList />
         </Container>
