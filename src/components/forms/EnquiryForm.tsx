@@ -196,19 +196,20 @@ export function EnquiryForm({ areas = [], whatsappNumber }: EnquiryFormProps) {
           size="md"
           fullWidth
           disabled={loading}
+          className="bg-orange-500 hover:bg-orange-600"
         >
           {loading ? "Submitting..." : submitSuccess ? "✓ Submitted Successfully!" : "Submit Enquiry"}
         </Button>
 
         <Button
           type="button"
-          variant="outlineLight"
+          variant="primary"
           size="md"
           fullWidth
           onClick={handleSendWhatsApp}
-          className="gap-2"
+          className="gap-2 bg-green-600 hover:bg-green-700"
         >
-          <Image src="/whatsapp_green.svg" alt="WhatsApp" width={18} height={18} />
+          <Image src="/whatsapp.svg" alt="WhatsApp" width={22} height={22} />
           Send Enquiry on WhatsApp
         </Button>
       </div>

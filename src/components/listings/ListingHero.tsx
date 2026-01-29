@@ -73,7 +73,7 @@ function EmptyState({ message }: { message: string }) {
  * Green accent (not red).
  */
 export function ListingHero() {
-  const [category, setCategory] = useState<ListingCategory | undefined>("residential");
+  const [category, setCategory] = useState<ListingCategory | undefined>(undefined);
   const [transactionType, setTransactionType] = useState<ListingTransactionType | undefined>("buying");
   const [searchQuery, setSearchQuery] = useState("");
   const [filterModalOpen, setFilterModalOpen] = useState(false);
@@ -85,6 +85,7 @@ export function ListingHero() {
       transactionType,
       priceMin: appliedFilters?.priceMin,
       priceMax: appliedFilters?.priceMax,
+      areaSearch: searchQuery,
     }
   );
 
@@ -98,7 +99,7 @@ export function ListingHero() {
       <section className="relative min-h-0 w-full bg-white flex flex-col items-center justify-center pt-6 pb-4 md:min-h-[280px] md:pt-10 md:pb-6">
 
         <div className="w-full max-w-4xl px-4 sm:px-0">
-          <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+            <div className="bg-white border border-gray-200 border-t-orange-200/40 rounded-xl shadow-sm overflow-hidden">
             <div className="flex border-b border-gray-200">
               {CATEGORIES.map((c) => (
                 <button
@@ -124,7 +125,7 @@ export function ListingHero() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search area or locality"
-                  className="w-full pl-9 sm:pl-10 pr-3 sm:pr-4 py-2.5 sm:py-3 rounded-lg border border-gray-300 bg-white text-gray-900 text-sm sm:text-base placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                  className="w-full pl-9 sm:pl-10 pr-3 sm:pr-4 py-2.5 sm:py-3 rounded-lg border border-gray-300 bg-white text-gray-900 text-sm sm:text-base placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 focus:shadow-[0_0_0_3px_rgba(251,146,60,0.12)]"
                   aria-label="Search area or locality"
                 />
               </div>
@@ -132,7 +133,7 @@ export function ListingHero() {
                 <button
                   type="button"
                   onClick={() => setFilterModalOpen(true)}
-                  className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg border border-gray-300 bg-white text-gray-700 font-medium text-xs sm:text-sm hover:bg-gray-50 transition-colors flex-shrink-0 touch-manipulation"
+                  className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg border border-gray-300 bg-white text-gray-700 font-medium text-xs sm:text-sm hover:bg-gray-50 hover:border-orange-200 transition-colors flex-shrink-0 touch-manipulation focus:outline-none focus:ring-2 focus:ring-orange-400/20 focus:border-orange-200"
                   aria-label="Open filters"
                 >
                   <SlidersHorizontal className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -141,7 +142,7 @@ export function ListingHero() {
                 <button
                   type="button"
                   onClick={scrollToExplore}
-                  className="flex-1 sm:flex-none px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg bg-green-600 text-white font-semibold text-xs sm:text-sm hover:bg-green-700 transition-colors whitespace-nowrap flex-shrink-0 touch-manipulation"
+                  className="flex-1 sm:flex-none px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg bg-orange-500 text-white font-semibold text-xs sm:text-sm hover:bg-orange-600 transition-colors whitespace-nowrap flex-shrink-0 touch-manipulation focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-orange-400/40"
                 >
                   Search
                 </button>

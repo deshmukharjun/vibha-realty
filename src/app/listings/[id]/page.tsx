@@ -13,6 +13,20 @@ import { ArrowLeft, Share2, MapPin, Home } from "lucide-react";
 
 const WHATSAPP_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "919881199152";
 
+/** For listing detail page: request higher-res image when source is Unsplash (card uses 320x220). */
+function toHighResListingImageUrl(url: string): string {
+  try {
+    const u = new URL(url);
+    if (!u.hostname.includes("unsplash.com")) return url;
+    u.searchParams.set("w", "1200");
+    u.searchParams.set("h", "800");
+    u.searchParams.set("fit", "crop");
+    return u.toString();
+  } catch {
+    return url;
+  }
+}
+
 function useListing(id: string | undefined) {
   const [listing, setListing] = useState<Listing | null | undefined>(undefined);
   const [error, setError] = useState<string | null>(null);
@@ -128,7 +142,7 @@ export default function ListingDetailPage() {
               {listing.propertyType}
             </span>
             {listing.statusTag && (
-              <span className="px-2 py-0.5 rounded text-xs font-semibold bg-green-600 text-white">
+              <span className="px-2 py-0.5 rounded text-xs font-semibold bg-orange-500 text-white">
                 {listing.statusTag}
               </span>
             )}
@@ -147,11 +161,11 @@ export default function ListingDetailPage() {
                   src={activeMedia.url}
                   controls
                   className="w-full h-full object-cover"
-                  poster={primaryMedia?.type === "image" ? primaryMedia.url : undefined}
+                  poster={primaryMedia?.type === "image" ? toHighResListingImageUrl(primaryMedia.url) : undefined}
                 />
               ) : activeMedia ? (
                 <WatermarkedImage
-                  src={activeMedia.url}
+                  src={toHighResListingImageUrl(activeMedia.url)}
                   alt={`${title}, image ${galleryIndex + 1} of ${sortedMedia.length}`}
                   className="rounded-none"
                   sizes="(max-width: 1024px) 100vw, 1024px"

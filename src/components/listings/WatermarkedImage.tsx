@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { WATERMARK_TEXT } from "@/lib/watermark";
+import { WATERMARK_LINE1, WATERMARK_LINE2 } from "@/lib/watermark";
 
 interface WatermarkedImageProps {
   src: string;
@@ -41,10 +41,15 @@ export function WatermarkedImage({
         priority={priority}
       />
       <div
-        className="absolute bottom-2 right-2 px-2 py-1 rounded text-white text-xs font-medium bg-black/60 whitespace-nowrap"
+        className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none text-center"
         aria-hidden
       >
-        {WATERMARK_TEXT}
+        <span className="text-white font-bold text-2xl sm:text-3xl md:text-4xl lg:text-5xl opacity-35 leading-tight">
+          {WATERMARK_LINE1}
+        </span>
+        <span className="text-white font-bold text-2xl sm:text-3xl md:text-4xl lg:text-5xl opacity-35 leading-tight">
+          {WATERMARK_LINE2}
+        </span>
       </div>
     </div>
   );

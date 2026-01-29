@@ -25,7 +25,7 @@ export function ListingCard({ listing }: ListingCardProps) {
 
   return (
     <article
-      className="flex-shrink-0 w-[260px] sm:w-[280px] md:w-[320px] rounded-xl border border-gray-200 bg-white overflow-hidden shadow-sm hover:shadow-md transition-shadow touch-manipulation"
+      className="flex-shrink-0 w-[260px] sm:w-[280px] md:w-[320px] rounded-xl border border-gray-200 border-orange-100/40 bg-white overflow-hidden shadow-sm hover:shadow-md hover:border-orange-200/60 transition-all touch-manipulation"
       data-ownership={listing.ownership}
     >
       <Link href={detailHref} className="block">
@@ -43,7 +43,7 @@ export function ListingCard({ listing }: ListingCardProps) {
             </div>
           )}
           {listing.statusTag && (
-            <span className="absolute top-2 left-2 px-2 py-0.5 rounded text-xs font-semibold bg-green-600 text-white shadow-sm">
+            <span className="absolute top-2 left-2 px-2 py-0.5 rounded text-xs font-semibold bg-orange-500 text-white shadow-sm">
               {listing.statusTag}
             </span>
           )}

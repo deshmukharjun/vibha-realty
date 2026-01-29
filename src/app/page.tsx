@@ -86,19 +86,19 @@ export default function Home() {
               {/* Trust Indicators */}
               <div className="grid grid-cols-3 gap-4 mb-8">
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-green-600 mb-2">
+                  <div className="text-3xl font-bold text-orange-500 mb-2">
                     <CountUpNumber end={10} suffix="+" />
                   </div>
                   <p className="text-sm text-gray-700">Years of Trust</p>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-green-600 mb-2">
+                  <div className="text-3xl font-bold text-orange-500 mb-2">
                     <CountUpNumber end={365} suffix="+" />
                   </div>
                   <p className="text-sm text-gray-700">Families Helped</p>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-green-600 mb-2">
+                  <div className="text-3xl font-bold text-orange-500 mb-2">
                     <CountUpNumber end={67} suffix="+" />
                   </div>
                   <p className="text-sm text-gray-700">Successful Projects</p>

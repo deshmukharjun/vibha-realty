@@ -13,8 +13,20 @@ import {
 import { db } from '@/lib/firebase'
 import type { Area, ChannelPartner, Testimonial, Enquiry, Listing } from '@/types/cms'
 
-/** Placeholder image base for dummy listings (allowed in next.config remotePatterns). Uses seed so each listing gets a distinct image. */
-const placeholder = (seed: string) => `https://picsum.photos/seed/${seed}/320/220`
+/** House/property placeholder images for dummy listings (Unsplash, allowed in next.config remotePatterns). Uses seed so each listing gets a distinct image. Only verified working IDs (some Unsplash IDs 404). */
+const HOUSE_IMAGES = [
+  '1564013799919-ab600027ffc6',
+  '1600596542815-ffad4c1539a9',
+  '1600585154340-be6161a56a0c',
+  '1564013799919-ab600027ffc6',
+  '1600596542815-ffad4c1539a9',
+  '1600585154340-be6161a56a0c',
+]
+const placeholder = (seed: string) => {
+  let i = 0
+  for (let j = 0; j < seed.length; j++) i = (i + seed.charCodeAt(j)) % HOUSE_IMAGES.length
+  return `https://images.unsplash.com/photo-${HOUSE_IMAGES[i]}?w=320&h=220&fit=crop`
+}
 
 /** 7–8 dummy listings for public hero when Firestore returns empty. Mix of personal/channel-partner, categories, and transaction types. */
 const DUMMY_LISTINGS: Listing[] = [
@@ -292,6 +304,8 @@ export const useListings = (
     priceMin?: number
     /** Price max in lakhs (e.g. 100 = ₹1Cr). Listing passes if its min price <= this. */
     priceMax?: number
+    /** Area/locality search: listings whose area (or propertyType) contains this string (case-insensitive). */
+    areaSearch?: string
   },
   options?: { forAdmin?: boolean }
 ) => {
@@ -335,6 +349,7 @@ export const useListings = (
     !forAdmin && rawListings.length === 0 && !error ? DUMMY_LISTINGS : rawListings
   const priceMinPaise = filters?.priceMin != null ? filters.priceMin * 1_00_000 : null
   const priceMaxPaise = filters?.priceMax != null ? filters.priceMax * 1_00_000 : null
+  const areaQuery = filters?.areaSearch?.trim().toLowerCase() ?? ''
   const filtered = sourceList.filter((l) => {
     if (filters?.category && l.category !== filters.category) return false
     if (filters?.transactionType && l.transactionType !== filters.transactionType) return false
@@ -345,6 +360,11 @@ export const useListings = (
     if (priceMaxPaise != null) {
       const listingMin = l.priceRangeMin ?? l.priceRangeMax ?? Infinity
       if (listingMin > priceMaxPaise) return false
+    }
+    if (areaQuery) {
+      const area = (l.area ?? '').toLowerCase()
+      const propertyType = (l.propertyType ?? '').toLowerCase()
+      if (!area.includes(areaQuery) && !propertyType.includes(areaQuery)) return false
     }
     return true
   })

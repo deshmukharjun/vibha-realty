@@ -3,6 +3,9 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  /* Subtle orange accent (10–15%) for outlines and focus */
+  --orange-accent: 251 146 60;
+  --orange-accent-muted: 254 243 199;
 }
 
 @theme inline {

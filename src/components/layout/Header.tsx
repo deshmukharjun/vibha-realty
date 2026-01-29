@@ -75,7 +75,7 @@ export function Header({ whatsappNumber }: HeaderProps) {
   );
 
   return (
-    <header className="bg-white border-b border-gray-200 sticky top-0 z-30">
+    <header className="bg-white border-b border-gray-200 border-b-orange-100/60 sticky top-0 z-30">
       <Container>
         <div className="flex items-center justify-between py-4">
           <Link href="/" className="flex items-center gap-2">
@@ -113,7 +113,7 @@ export function Header({ whatsappNumber }: HeaderProps) {
           {/* Mobile hamburger */}
           <button
             type="button"
-            className="md:hidden inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-green-600"
+            className="md:hidden inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:bg-gray-100 hover:bg-orange-50/80 focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-orange-400/20"
             onClick={() => setMobileOpen((prev) => !prev)}
             aria-label="Toggle navigation"
           >

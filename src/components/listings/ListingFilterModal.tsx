@@ -595,7 +595,7 @@ export function ListingFilterModal({
           <button
             type="button"
             onClick={handleSearch}
-            className="flex-1 rounded-lg bg-green-600 py-3 text-sm font-semibold text-white hover:bg-green-700"
+            className="flex-1 rounded-lg bg-orange-500 py-3 text-sm font-semibold text-white hover:bg-orange-600"
           >
             Search
           </button>
