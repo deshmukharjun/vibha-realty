@@ -455,7 +455,7 @@ export function ListingForm({
         <button
           type="submit"
           disabled={saving}
-          className="rounded-lg bg-[var(--color-accent)] text-white px-6 py-2 font-medium text-sm hover:brightness-90 disabled:opacity-50"
+          className="rounded-lg bg-(--color-accent) text-white px-6 py-2 font-medium text-sm hover:brightness-90 disabled:opacity-50"
         >
           {saving ? "Saving…" : submitLabel}
         </button>

@@ -118,7 +118,7 @@ export function EnquiryForm({ areas = [], whatsappNumber }: EnquiryFormProps) {
           onChange={handleChange}
           required
           placeholder="Your name"
-          className="w-full px-4 py-2 border border-[var(--color-accent)] rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-black placeholder:text-gray-500"
+          className="w-full px-4 py-2 border border-(--color-accent) rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-black placeholder:text-gray-500"
         />
       </div>
 
@@ -131,7 +131,7 @@ export function EnquiryForm({ areas = [], whatsappNumber }: EnquiryFormProps) {
             name="countryCode"
             value={formData.countryCode}
             onChange={handleChange}
-            className="px-3 py-2 border border-[var(--color-accent)] rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-gray-700 bg-transparent"
+            className="px-3 py-2 border border-(--color-accent) rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-gray-700 bg-transparent"
           >
             {COUNTRY_CODES.map((cc) => (
               <option key={cc.code} value={cc.code}>
@@ -147,7 +147,7 @@ export function EnquiryForm({ areas = [], whatsappNumber }: EnquiryFormProps) {
             required
             placeholder={formData.countryCode === "+91" ? "10-digit number" : "Phone number"}
             pattern={formData.countryCode === "+91" ? "[0-9]{10}" : undefined}
-            className="flex-1 px-4 py-2 border border-[var(--color-accent)] text-black rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 placeholder:text-gray-500"
+            className="flex-1 px-4 py-2 border border-(--color-accent) text-black rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 placeholder:text-gray-500"
           />
         </div>
       </div>
@@ -160,7 +160,7 @@ export function EnquiryForm({ areas = [], whatsappNumber }: EnquiryFormProps) {
           name="requirement"
           value={formData.requirement}
           onChange={handleChange}
-          className="w-full px-4 py-2 border border-[var(--color-accent)] rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-gray-700"
+          className="w-full px-4 py-2 border border-(--color-accent) rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-gray-700"
         >
           <option value="buy">Buy</option>
           <option value="rent">Rent</option>
@@ -177,7 +177,7 @@ export function EnquiryForm({ areas = [], whatsappNumber }: EnquiryFormProps) {
             name="area"
             value={formData.area}
             onChange={handleChange}
-            className="w-full px-4 py-2 border border-[var(--color-accent)] rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-gray-700"
+            className="w-full px-4 py-2 border border-(--color-accent) rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-gray-700"
           >
             <option value="">Select an area</option>
             {areas.map((area) => (
@@ -196,7 +196,7 @@ export function EnquiryForm({ areas = [], whatsappNumber }: EnquiryFormProps) {
           size="md"
           fullWidth
           disabled={loading}
-          className="bg-[var(--color-accent)] hover:brightness-90"
+          className="bg-(--color-accent) hover:brightness-90"
         >
           {loading ? "Submitting..." : submitSuccess ? "✓ Submitted Successfully!" : "Submit Enquiry"}
         </Button>
@@ -207,7 +207,7 @@ export function EnquiryForm({ areas = [], whatsappNumber }: EnquiryFormProps) {
           size="md"
           fullWidth
           onClick={handleSendWhatsApp}
-          className="gap-2 bg-[var(--color-accent)] hover:brightness-90"
+          className="gap-2 bg-(--color-accent) hover:brightness-90"
         >
           <Image src="/whatsapp.svg" alt="WhatsApp" width={22} height={22} />
           Send Enquiry on WhatsApp

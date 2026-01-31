@@ -9,7 +9,7 @@ const EMAIL = process.env.NEXT_PUBLIC_EMAIL || "vibha.realties@gmail.com";
 export default function Contact() {
   return (
     <>
-      <section className="py-16 md:py-24 bg-[var(--color-primary)]">
+      <section className="py-16 md:py-24 bg-(--color-primary)">
         <Container>
           <div className="max-w-3xl mx-auto">
             <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 text-center">
@@ -19,7 +19,7 @@ export default function Contact() {
               Have questions? Ready to find your perfect property? Reach out and let us chat!
             </p>
 
-            <div className="bg-[var(--color-secondary)] border border-gray-200 rounded-lg p-8 md:p-12">
+            <div className="bg-(--color-secondary) border border-gray-200 rounded-lg p-8 md:p-12">
               <h2 className="text-2xl font-bold text-gray-900 mb-2">Quick Enquiry Form</h2>
               <p className="text-gray-600 mb-8">
                 Fill this form and I will connect with you on WhatsApp or call within minutes.

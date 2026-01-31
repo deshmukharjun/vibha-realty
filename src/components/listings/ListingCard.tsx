@@ -25,7 +25,7 @@ export function ListingCard({ listing }: ListingCardProps) {
 
   return (
     <article
-      className="flex-shrink-0 w-[260px] sm:w-[280px] md:w-[320px] rounded-xl border border-[var(--color-accent)] border-[rgba(101,139,88,0.08)] bg-[var(--color-primary)] overflow-hidden shadow-sm hover:shadow-md hover:border-[rgba(101,139,88,0.25)] transition-all touch-manipulation"
+      className="shrink-0 w-65 sm:w-70 md:w-80 rounded-xl border border-(--color-accent) bg-(--color-primary) overflow-hidden shadow-sm hover:shadow-md hover:border-[rgba(101,139,88,0.25)] transition-all touch-manipulation"
       data-ownership={listing.ownership}
     >
       <Link href={detailHref} className="block">
@@ -43,7 +43,7 @@ export function ListingCard({ listing }: ListingCardProps) {
             </div>
           )}
           {listing.statusTag && (
-            <span className="absolute top-2 left-2 px-2 py-0.5 rounded text-xs font-semibold bg-[var(--color-accent)] text-white shadow-sm">
+            <span className="absolute top-2 left-2 px-2 py-0.5 rounded text-xs font-semibold bg-(--color-accent) text-white shadow-sm">
               {listing.statusTag}
             </span>
           )}
@@ -64,7 +64,7 @@ export function ListingCard({ listing }: ListingCardProps) {
           href={whatsappUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-1.5 sm:gap-2 text-green-600 font-semibold text-xs sm:text-sm hover:text-green-700 hover:underline transition-colors min-h-[44px] items-center"
+          className="inline-flex items-center gap-1.5 sm:gap-2 text-green-600 font-semibold text-xs sm:text-sm hover:text-green-700 hover:underline transition-colors min-h-11"
         >
           Talk to Charushila
         </a>

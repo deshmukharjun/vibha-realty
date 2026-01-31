@@ -20,21 +20,21 @@ export default function Home() {
       <ListingHero />
 
       {/* About Me – headshot, description, and trusted-by logo carousel */}
-      <section id="about" className="relative py-20 md:py-28 overflow-hidden scroll-mt-20 bg-[var(--color-primary)]">
+      <section id="about" className="relative py-20 md:py-28 overflow-hidden scroll-mt-20 bg-(--color-primary)">
         <Container maxWidth="lg">
           <div className="relative grid grid-cols-1 md:grid-cols-2 gap-14 items-stretch">
 
-            <div className="order-2 md:order-1 bg-[var(--color-secondary)] border border-gray-200 p-6 rounded-xl shadow-sm">
+            <div className="order-2 md:order-1 bg-(--color-secondary) border border-(--color-accent) p-6 rounded-xl shadow-sm">
               <h1 className="text-3xl md:text-4xl font-semibold text-gray-900 leading-tight">
                 Hi, I&apos;m Charushila Bhalerao
               </h1>
-              <h2 className="mt-2 text-xl md:text-2xl font-medium text-gray-600">
+              <h2 className="mt-2 text-xl md:text-2xl font-medium text-(--color-accent)">
                 10+ Years of Trusted Real Estate Expertise in Pune, Maharashtra
               </h2>
               <div className="mt-5 flex flex-wrap gap-3 text-sm text-gray-600">
-                <span className="px-3 py-1 border border-[var(--color-accent)] rounded-full">Residential & Investment</span>
-                <span className="px-3 py-1 border border-[var(--color-accent)] rounded-full">Pune Specialist</span>
-                <span className="px-3 py-1 border border-[var(--color-accent)] rounded-full">Client-First Approach</span>
+                <span className="px-3 py-1 border border-(--color-accent) rounded-full">Residential & Investment</span>
+                <span className="px-3 py-1 border border-(--color-accent) rounded-full">Pune Specialist</span>
+                <span className="px-3 py-1 border border-(--color-accent) rounded-full">Client-First Approach</span>
               </div>
               <p className="mt-6 text-md text-gray-800 leading-relaxed">
                 Over the last <b>10+ years</b>, I&apos;ve helped over <b>365 families</b> find their dream homes in Pune&apos;s most sought-after neighborhoods. From first-time buyers in Baner to seasoned investors in Wakad.
@@ -46,12 +46,12 @@ export default function Home() {
                 Whether you&apos;re looking for a 2 BHK, a luxury villa, or a strategic investment, I <b>bring deep market knowledge</b>, strong builder relationships, and a genuine commitment to your success.
               </p>
             </div>
-            <div className="order-1 md:order-2 relative h-full min-h-[400px] md:min-h-[500px]">
+            <div className="order-1 md:order-2 relative h-full min-h-100 md:min-h-125">
               <Image
                 src="/headshot.jpeg"
                 alt="Charushila Bhalerao – Pune Real Estate Consultant"
                 fill
-                className="rounded-2xl object-cover shadow-[0_20px_40px_rgba(0,0,0,0.12)]"
+                className="rounded-2xl object-cover border border-(--color-accent) shadow-[0_20px_40px_rgba(0,0,0,0.12)]"
               />
             </div>
           </div>
@@ -68,7 +68,7 @@ export default function Home() {
       </section>
 
       {/* Property Search Hero (second section) */}
-      <section className="relative py-16 md:py-24 overflow-hidden bg-[var(--color-primary)]">
+      <section className="relative py-16 md:py-24 overflow-hidden bg-(--color-primary)">
         <Container>
           <div className="relative grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12 items-stretch">
             {/* Left Content */}
@@ -86,19 +86,19 @@ export default function Home() {
               {/* Trust Indicators */}
               <div className="grid grid-cols-3 gap-4 mb-8">
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-[var(--color-accent)] mb-2">
+                  <div className="text-3xl font-bold text-(--color-accent) mb-2">
                     <CountUpNumber end={10} suffix="+" />
                   </div>
                   <p className="text-sm text-gray-700">Years of Trust</p>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-[var(--color-accent)] mb-2">
+                  <div className="text-3xl font-bold text-(--color-accent) mb-2">
                     <CountUpNumber end={365} suffix="+" />
                   </div>
                   <p className="text-sm text-gray-700">Families Helped</p>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-[var(--color-accent)] mb-2">
+                  <div className="text-3xl font-bold text-(--color-accent) mb-2">
                     <CountUpNumber end={67} suffix="+" />
                   </div>
                   <p className="text-sm text-gray-700">Successful Projects</p>
@@ -121,7 +121,7 @@ export default function Home() {
             </div>
 
             {/* Right - Form */}
-            <div className="bg-[var(--color-secondary)] border border-[var(--color-accent)] p-6 rounded-xl shadow-sm flex flex-col">
+            <div className="bg-(--color-secondary) border border-(--color-accent) p-6 rounded-xl shadow-sm flex flex-col">
               <h2 className="text-2xl font-bold text-gray-900 mb-2">
                 Start Your Property Search Today
               </h2>
@@ -138,7 +138,7 @@ export default function Home() {
       <AreasSection />
 
       {/* Testimonials */}
-      <section id="testimonials" className="scroll-mt-20 py-16 md:py-24 bg-[var(--color-primary)]">
+      <section id="testimonials" className="scroll-mt-20 py-16 md:py-24 bg-(--color-primary)">
         <Container>
           <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
             Happy Clients

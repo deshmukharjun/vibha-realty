@@ -8,7 +8,7 @@ export const metadata = {
 
 export default function PrivacyPolicy() {
   return (
-    <div className="py-16 md:py-24 bg-[var(--color-primary)]">
+    <div className="py-16 md:py-24 bg-(--color-primary)">
       <Container>
         <div className="max-w-4xl mx-auto">
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-8">
@@ -159,7 +159,7 @@ export default function PrivacyPolicy() {
               <p>
                 If you have any questions about this Privacy Policy or wish to exercise your rights, please contact us:
               </p>
-              <div className="mt-4 p-4 bg-[var(--color-secondary)] rounded-lg">
+              <div className="mt-4 p-4 bg-(--color-secondary) rounded-lg">
                 <p className="font-semibold">Charushila Bhalerao</p>
                 <p>Vibha Realties</p>
                 <p>Pune, Maharashtra, India</p>

@@ -50,7 +50,7 @@ export default function TestimonialsPage() {
 
       <div className="bg-white rounded-lg shadow overflow-hidden">
         <div className="overflow-x-auto scrollbar-hide -mx-4 sm:mx-0">
-          <table className="w-full min-w-[560px]">
+          <table className="w-full min-w-140">
             <thead className="bg-gray-100 border-b">
               <tr>
                 <th className="px-3 md:px-6 py-3 text-left text-xs md:text-sm font-semibold text-gray-900">Client</th>

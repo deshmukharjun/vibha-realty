@@ -215,13 +215,13 @@ export function ListingFilterModal({
       role="presentation"
     >
       <div
-        className="relative w-full max-w-lg bg-[var(--color-primary)] shadow-xl rounded-t-2xl md:rounded-2xl mx-4 max-h-[90vh] overflow-y-auto scrollbar-hide"
+        className="relative w-full max-w-lg bg-(--color-primary) shadow-xl rounded-t-2xl md:rounded-2xl mx-4 max-h-[90vh] overflow-y-auto scrollbar-hide"
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
         aria-labelledby="filter-modal-title"
       >
-        <div className="sticky top-0 bg-[var(--color-primary)] border-b border-gray-200 px-4 py-3 flex items-center justify-between">
+        <div className="sticky top-0 bg-(--color-primary) border-b border-gray-200 px-4 py-3 flex items-center justify-between">
           <h2 id="filter-modal-title" className="text-lg font-semibold text-gray-900">
             Filters
           </h2>
@@ -249,8 +249,8 @@ export function ListingFilterModal({
                   onClick={() => setLocalTransaction(o.value)}
                   className={`rounded-lg border-2 px-4 py-2 text-sm font-medium transition-colors ${
                     localTransaction === o.value
-                      ? "border-[var(--color-accent)] bg-[var(--color-accent)] text-white"
-                      : "border-gray-200 bg-[var(--color-primary)] text-gray-700 hover:border-gray-300"
+                      ? "border-(--color-accent) bg-(--color-accent) text-white"
+                      : "border-gray-200 bg-(--color-primary) text-gray-700 hover:border-gray-300"
                   }`}
                 >
                   {o.label}
@@ -278,8 +278,8 @@ export function ListingFilterModal({
                     onClick={() => setLocalCategory(isAll ? "" : value)}
                     className={`rounded-lg border-2 px-3 py-1.5 text-sm font-medium transition-colors ${
                       (isAll && localCategory === "") || (!isAll && value === localCategory)
-                        ? "border-[var(--color-accent)] bg-[var(--color-accent)] text-white"
-                        : "border-gray-200 bg-[var(--color-primary)] text-gray-700 hover:border-gray-300"
+                        ? "border-(--color-accent) bg-(--color-accent) text-white"
+                        : "border-gray-200 bg-(--color-primary) text-gray-700 hover:border-gray-300"
                     }`}
                   >
                     {p.label}
@@ -453,7 +453,7 @@ export function ListingFilterModal({
                   type="button"
                   onClick={() => setNewEst(o.value)}
                   className={`rounded-lg border-2 px-3 py-1.5 text-sm font-medium transition-colors ${
-                    newEst === o.value ? "border-[var(--color-accent)] bg-[var(--color-accent)] text-white" : "border-gray-200 bg-[var(--color-primary)] text-gray-700"
+                    newEst === o.value ? "border-(--color-accent) bg-(--color-accent) text-white" : "border-gray-200 bg-(--color-primary) text-gray-700"
                   }`}
                 >
                   {o.label}
@@ -564,7 +564,7 @@ export function ListingFilterModal({
                   type="button"
                   onClick={() => setSaleMethod(o.value)}
                   className={`rounded-lg border-2 px-3 py-1.5 text-sm font-medium transition-colors ${
-                    saleMethod === o.value ? "border-[var(--color-accent)] bg-[var(--color-accent)] text-white" : "border-gray-200 bg-[var(--color-primary)] text-gray-700"
+                    saleMethod === o.value ? "border-(--color-accent) bg-(--color-accent) text-white" : "border-gray-200 bg-(--color-primary) text-gray-700"
                   }`}
                 >
                   {o.label}
@@ -584,7 +584,7 @@ export function ListingFilterModal({
           </label>
         </div>
 
-        <div className="sticky bottom-0 bg-[var(--color-primary)] border-t border-gray-200 p-4 flex gap-3">
+        <div className="sticky bottom-0 bg-(--color-primary) border-t border-gray-200 p-4 flex gap-3">
           <button
             type="button"
             onClick={handleClear}
@@ -595,7 +595,7 @@ export function ListingFilterModal({
           <button
             type="button"
             onClick={handleSearch}
-            className="flex-1 rounded-lg bg-[var(--color-accent)] py-3 text-sm font-semibold text-white hover:brightness-90"
+            className="flex-1 rounded-lg bg-(--color-accent) py-3 text-sm font-semibold text-white hover:brightness-90"
           >
             Search
           </button>
