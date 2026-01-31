@@ -16,13 +16,13 @@ export function Button({
   return (
     <button
       className={clsx(
-        "font-semibold rounded-lg transition-all duration-200 flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-orange-400/20",
+        "font-semibold rounded-lg transition-all duration-200 flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-[rgba(101,139,88,0.2)]",
         {
-          "bg-green-600 text-white hover:bg-green-700": variant === "primary",
+          "bg-[var(--color-accent)] text-white hover:brightness-90": variant === "primary",
           "bg-gray-200 text-gray-900 hover:bg-gray-300": variant === "secondary",
           "border-2 border-white text-white hover:bg-white hover:text-green-600":
             variant === "outline",
-          "border-2 border-green-600 border-orange-300/40 text-green-600 hover:bg-green-50 hover:border-orange-300/60":
+          "border-2 border-[var(--color-accent)] text-[var(--color-accent)] hover:bg-[var(--color-accent)] hover:text-white hover:brightness-90":
             variant === "outlineLight",
           "px-4 py-2 text-sm": size === "sm",
           "px-6 py-3 text-base": size === "md",

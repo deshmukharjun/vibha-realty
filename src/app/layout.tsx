@@ -44,7 +44,7 @@ export default function RootLayout({
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/logo.svg" type="image/svg+xml" />
       </head>
-      <body className={`${inter.variable} font-sans antialiased bg-white`} suppressHydrationWarning>
+      <body className={`${inter.variable} font-sans antialiased bg-[var(--color-primary)]`} suppressHydrationWarning>
         <Header whatsappNumber={WHATSAPP_NUMBER} />
         <main className="pb-24 md:pb-0">
           {children}

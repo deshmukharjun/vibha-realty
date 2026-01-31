@@ -103,9 +103,9 @@ export default function ListingDetailPage() {
   const title = `${listing.area} – ${listing.propertyType}`;
 
   return (
-    <div className="bg-white min-h-screen">
+    <div className="bg-[var(--color-primary)] min-h-screen">
       {/* Back + top bar */}
-      <div className="border-b border-gray-200 bg-white sticky top-0 z-20">
+      <div className="border-b border-gray-200 bg-[var(--color-primary)] sticky top-0 z-20">
         <Container>
           <div className="flex items-center justify-between py-4">
             <Link
@@ -142,7 +142,7 @@ export default function ListingDetailPage() {
               {listing.propertyType}
             </span>
             {listing.statusTag && (
-              <span className="px-2 py-0.5 rounded text-xs font-semibold bg-orange-500 text-white">
+              <span className="px-2 py-0.5 rounded text-xs font-semibold bg-[var(--color-accent)] text-white">
                 {listing.statusTag}
               </span>
             )}
@@ -230,7 +230,7 @@ export default function ListingDetailPage() {
         )}
 
         {/* Key details */}
-        <section className="mb-8 md:mb-12 rounded-xl border border-gray-200 p-6 bg-gray-50/50">
+        <section className="mb-8 md:mb-12 rounded-xl border border-gray-200 p-6 bg-[var(--color-secondary)]/50">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Key details</h2>
           <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
             <div>
@@ -277,7 +277,7 @@ export default function ListingDetailPage() {
               href={whatsappUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg bg-green-600 text-white font-semibold hover:bg-green-700 transition-colors"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg bg-[var(--color-accent)] text-white font-semibold hover:brightness-90 transition-colors"
             >
               <Image src="/whatsapp.svg" alt="" width={22} height={22} />
               Message Charushila

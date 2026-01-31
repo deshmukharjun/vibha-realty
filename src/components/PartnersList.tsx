@@ -37,7 +37,7 @@ export function PartnersList() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
       {partners.map((partner) => (
-        <div key={partner.id} className="bg-gray-50 border border-gray-200 rounded-lg p-8 hover:shadow-md transition">
+        <div key={partner.id} className="bg-[var(--color-secondary)] border border-gray-200 rounded-lg p-8 hover:shadow-md transition">
           <h3 className="text-xl font-bold text-gray-900 mb-3">{partner.name}</h3>
           <p className="text-gray-600 mb-4">{partner.propertyTypes.join(', ')} Properties</p>
           <div className="flex flex-wrap gap-2 mb-6">

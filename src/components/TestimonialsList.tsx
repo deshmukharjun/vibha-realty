@@ -34,7 +34,7 @@ export function TestimonialsList() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
       {testimonials.map((testimonial) => (
-        <div key={testimonial.id} className="bg-gray-50 border border-gray-200 rounded-lg p-8">
+        <div key={testimonial.id} className="bg-[var(--color-secondary)] border border-gray-200 rounded-lg p-8">
           <div className="flex mb-4">
             {[1, 2, 3, 4, 5].map((star) => (
               <span 

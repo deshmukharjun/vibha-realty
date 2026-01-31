@@ -16,7 +16,7 @@ export function TestimonialCTA() {
         <button
           type="button"
           onClick={() => setModalOpen(true)}
-          className="px-6 py-3 rounded-lg bg-green-600 text-white font-semibold hover:bg-green-700 transition-colors"
+          className="px-6 py-3 rounded-lg bg-[var(--color-accent)] text-white font-semibold hover:brightness-90 transition-colors"
         >
           Write a testimonial
         </button>
@@ -29,13 +29,13 @@ export function TestimonialCTA() {
           role="presentation"
         >
           <div
-            className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto scrollbar-hide rounded-xl bg-white shadow-xl mx-4"
+            className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto scrollbar-hide rounded-xl bg-[var(--color-primary)] shadow-xl mx-4"
             onClick={(e) => e.stopPropagation()}
             role="dialog"
             aria-modal="true"
             aria-labelledby="testimonial-modal-title"
           >
-            <div className="sticky top-0 bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between rounded-t-xl">
+            <div className="sticky top-0 bg-[var(--color-primary)] border-b border-gray-200 px-4 py-3 flex items-center justify-between rounded-t-xl">
               <h2 id="testimonial-modal-title" className="text-lg font-semibold text-gray-900">
                 Write a testimonial
               </h2>

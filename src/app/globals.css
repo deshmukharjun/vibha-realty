@@ -1,17 +1,27 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
+  /* 60-30-10 color strategy variables */
+  --color-primary: #ececec; /* 60% - Neutral background */
+  --color-secondary: #d2dcb6; /* 30% - Supporting UI elements / cards */
+  --color-accent: #658b58; /* 10% - Buttons / CTAs */
+
+  /* Backwards-compatible aliases */
+  --background: var(--color-primary);
   --foreground: #171717;
-  /* Subtle orange accent (10–15%) for outlines and focus */
-  --orange-accent: 251 146 60;
-  --orange-accent-muted: 254 243 199;
+
+  /* Accent RGB components for focus/overlay utilities */
+  --color-accent-r: 101;
+  --color-accent-g: 139;
+  --color-accent-b: 88;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-sans:
+    var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
   --animate-infinite-scroll: infinite-scroll 40s linear infinite;
 }
 
@@ -27,14 +37,31 @@
 
 /* Logo carousel: fade edges, works across browsers */
 .logo-carousel-mask {
-  -webkit-mask-image: linear-gradient(to right, transparent 0, black 80px, black calc(100% - 80px), transparent 100%);
-  mask-image: linear-gradient(to right, transparent 0, black 80px, black calc(100% - 80px), transparent 100%);
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    black 80px,
+    black calc(100% - 80px),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    black 80px,
+    black calc(100% - 80px),
+    transparent 100%
+  );
 }
 
 /* Keep light theme only – avoids dark backgrounds / black bars */
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #ffffff;
+    /* Keep palette consistent for light-only design; map to variables */
+    --color-primary: #ececec;
+    --color-secondary: #d2dcb6;
+    --color-accent: #658b58;
+
+    --background: var(--color-primary);
     --foreground: #171717;
   }
 }
@@ -50,7 +77,15 @@ html::-webkit-scrollbar {
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-family:
+    var(--font-inter),
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    "Helvetica Neue",
+    Arial,
+    sans-serif;
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
@@ -72,4 +107,36 @@ body::-webkit-scrollbar {
   .safe-area-inset-bottom {
     padding-bottom: max(1rem, env(safe-area-inset-bottom));
   }
+}
+
+/* Accent / secondary helpers (use in markup as additional classes) */
+.bg-accent {
+  background: var(--color-accent);
+}
+.text-accent {
+  color: var(--color-accent);
+}
+.border-accent {
+  border-color: var(--color-accent);
+}
+.bg-secondary {
+  background: var(--color-secondary);
+}
+
+/* Focus ring using accent with adjustable alpha */
+.focus-ring-accent:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px
+    rgb(var(--color-accent-r) var(--color-accent-g) var(--color-accent-b) / 0.2);
+}
+
+/* Utility to create a faint accent border via rgba */
+.border-accent-20 {
+  border-color: rgb(
+    var(--color-accent-r) var(--color-accent-g) var(--color-accent-b) / 0.2
+  );
+}
+.ring-accent-20 {
+  box-shadow: 0 0 0 3px
+    rgb(var(--color-accent-r) var(--color-accent-g) var(--color-accent-b) / 0.2);
 }

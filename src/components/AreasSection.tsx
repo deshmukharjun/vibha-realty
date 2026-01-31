@@ -12,7 +12,7 @@ export function AreasSection() {
   const { areas, loading, error } = useAreas();
 
   return (
-    <section id="areas" className="scroll-mt-20 py-16 md:py-24 bg-white">
+    <section id="areas" className="scroll-mt-20 py-16 md:py-24 bg-[var(--color-primary)]">
       <Container>
         <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 text-center">
           Areas of Operation
@@ -31,7 +31,7 @@ export function AreasSection() {
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
             {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="bg-gray-50 border border-gray-200 rounded-lg p-8 animate-pulse">
+              <div key={i} className="bg-[var(--color-secondary)] border border-gray-200 rounded-lg p-8 animate-pulse">
                 <div className="h-7 bg-gray-200 rounded w-1/3 mb-4" />
                 <div className="h-4 bg-gray-200 rounded w-full mb-2" />
                 <div className="h-4 bg-gray-200 rounded w-2/3" />
@@ -48,7 +48,7 @@ export function AreasSection() {
               return (
                 <div
                   key={area.id}
-                  className="bg-gray-50 border border-gray-200 rounded-lg p-8"
+                  className="bg-[var(--color-secondary)] border border-gray-200 rounded-lg p-8"
                 >
                   <h3 className="text-2xl font-bold text-gray-900 mb-3">{area.name}</h3>
                   <p className="text-gray-700 mb-6">
@@ -58,7 +58,7 @@ export function AreasSection() {
                     href={href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center gap-2 w-full font-semibold rounded-lg bg-green-600 text-white hover:bg-green-700 px-4 py-2 text-sm transition-all duration-200"
+                    className="inline-flex items-center justify-center gap-2 w-full font-semibold rounded-lg bg-[var(--color-accent)] text-white hover:brightness-90 px-4 py-2 text-sm transition-all duration-200"
                   >
                     <Image src="/whatsapp.svg" alt="WhatsApp" width={16} height={16} />
                     Get added to  {area.name} Broadcast

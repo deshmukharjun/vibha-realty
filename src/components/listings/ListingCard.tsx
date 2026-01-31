@@ -25,11 +25,11 @@ export function ListingCard({ listing }: ListingCardProps) {
 
   return (
     <article
-      className="flex-shrink-0 w-[260px] sm:w-[280px] md:w-[320px] rounded-xl border border-gray-200 border-orange-100/40 bg-white overflow-hidden shadow-sm hover:shadow-md hover:border-orange-200/60 transition-all touch-manipulation"
+      className="flex-shrink-0 w-[260px] sm:w-[280px] md:w-[320px] rounded-xl border border-[var(--color-accent)] border-[rgba(101,139,88,0.08)] bg-[var(--color-primary)] overflow-hidden shadow-sm hover:shadow-md hover:border-[rgba(101,139,88,0.25)] transition-all touch-manipulation"
       data-ownership={listing.ownership}
     >
       <Link href={detailHref} className="block">
-        <div className="relative h-40 sm:h-44 w-full">
+        <div className="relative h-40 sm:h-44 w-full p-2">
           {primaryMedia ? (
             <WatermarkedImage
               src={primaryMedia.url}
@@ -43,7 +43,7 @@ export function ListingCard({ listing }: ListingCardProps) {
             </div>
           )}
           {listing.statusTag && (
-            <span className="absolute top-2 left-2 px-2 py-0.5 rounded text-xs font-semibold bg-orange-500 text-white shadow-sm">
+            <span className="absolute top-2 left-2 px-2 py-0.5 rounded text-xs font-semibold bg-[var(--color-accent)] text-white shadow-sm">
               {listing.statusTag}
             </span>
           )}
@@ -66,7 +66,6 @@ export function ListingCard({ listing }: ListingCardProps) {
           rel="noopener noreferrer"
           className="inline-flex items-center gap-1.5 sm:gap-2 text-green-600 font-semibold text-xs sm:text-sm hover:text-green-700 hover:underline transition-colors min-h-[44px] items-center"
         >
-          <Image src="/whatsapp.svg" alt="" width={18} height={18} />
           Talk to Charushila
         </a>
       </div>
