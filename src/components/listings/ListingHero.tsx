@@ -96,7 +96,7 @@ export function ListingHero() {
   return (
     <>
       {/* Hero: clean white background, light search card */}
-      <section className="relative min-h-0 w-full bg-(--color-primary) flex flex-col items-center justify-center pt-6 pb-4 md:min-h-[280px] md:pt-10 md:pb-6">
+      <section className="relative min-h-0 w-full bg-(--color-primary) flex flex-col items-center justify-center pt-6 pb-4 md:min-h-70 md:pt-10 md:pb-6">
 
         <div className="w-full max-w-4xl px-4 sm:px-0">
             <div className="bg-(--color-secondary) rounded-xl shadow-sm overflow-hidden">

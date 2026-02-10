@@ -34,7 +34,7 @@ export default function Contact() {
             <div className="mt-12 bg-blue-50 border border-blue-200 rounded-lg p-8">
               <h3 className="text-lg font-bold text-gray-900 mb-3">Why Contact Me?</h3>
               <ul className="space-y-2 text-gray-700">
-                <li> 15+ years of experience in Pune real estate</li>
+                <li> 8+ years of experience in Pune real estate</li>
                 <li> Deep knowledge of all major localities</li>
                 <li> Access to properties from top builders</li>
                 <li> Honest, transparent guidance</li>

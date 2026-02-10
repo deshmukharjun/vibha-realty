@@ -58,7 +58,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   const sidebar = (
     <div className="flex flex-col h-full">
-      <div className="p-4 md:p-6 flex-shrink-0">
+      <div className="p-4 md:p-6 shrink-0">
         <h1 className="text-xl md:text-2xl font-bold text-white">Vibha CMS</h1>
         <p className="text-gray-400 text-xs md:text-sm mt-1 truncate" title={user.email ?? ''}>
           {user.email}
@@ -82,7 +82,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         ))}
       </nav>
 
-      <div className="p-4 md:p-6 flex-shrink-0 border-t border-gray-700">
+      <div className="p-4 md:p-6 shrink-0 border-t border-gray-700">
         <button
           onClick={handleLogout}
           className="w-full bg-red-600 hover:bg-red-700 text-white py-2.5 md:py-2 rounded-lg text-sm font-medium transition touch-manipulation"
@@ -109,7 +109,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         className={`
           fixed md:static inset-y-0 left-0 z-50 w-64 bg-gray-900 text-white
           flex flex-col transform transition-transform duration-200 ease-out
-          md:translate-x-0 md:flex-shrink-0
+          md:translate-x-0 md:shrink-0
           ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
         `}
       >

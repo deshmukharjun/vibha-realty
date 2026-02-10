@@ -7,6 +7,7 @@ This document provides a complete analysis of which CMS content appears on which
 ## 📊 Content Type Overview
 
 Your CMS manages 5 main content types:
+
 1. **Blog Posts** - Property insights and market updates
 2. **Areas** - Service areas in Pune
 3. **Channel Partners** - Builder/developer partnerships
@@ -17,18 +18,21 @@ Your CMS manages 5 main content types:
 
 ## 🏠 Page-by-Page Content Mapping
 
-### 1. **Homepage (`/`)** 
+### 1. **Homepage (`/`)**
 
 **Currently Hardcoded (needs CMS integration):**
+
 - Areas section (line 122): Currently shows hardcoded list `["Baner", "Wakad", "Hadapsar", ...]`
 - **Should pull from:** `Areas` CMS collection
 - Quick enquiry form areas (line 77): Hardcoded `["Baner", "Pune City", "Wakad", "Hadapsar"]`
 - **Should pull from:** `Areas` CMS collection
 
 **Dynamic Content (Already Connected):**
+
 - None - homepage is currently static except for form submission
 
 **📝 Action Items:**
+
 - ✅ EnquiryForm uses CMS areas (already implemented via `useAreas()` hook)
 - ⚠️ Homepage areas section still hardcoded - needs to fetch from Areas CMS
 
@@ -37,10 +41,12 @@ Your CMS manages 5 main content types:
 ### 2. **Blog Page (`/blog`)**
 
 **Dynamic Content (Already Connected):**
+
 - ✅ Blog posts list via `<BlogList />` component
 - ✅ Filters by category and area (UI ready, backend filtering may need implementation)
 
 **CMS Content Used:**
+
 - **Blog Posts Collection** - Only shows `status: 'published'` posts
 - Fields displayed:
   - `title` - Blog title
@@ -51,11 +57,13 @@ Your CMS manages 5 main content types:
   - `publishedAt` - Publication date
 
 **📝 Action Items:**
+
 - ✅ Blog posts are fully dynamic
 - ⚠️ Search functionality UI exists but needs backend implementation
 - ⚠️ Category filter dropdown exists but needs filtering logic
 
 **Content to Add in Admin:**
+
 ```
 Go to: /admin/dashboard/blogs
 Create blog posts with:
@@ -77,10 +85,12 @@ Create blog posts with:
 ### 3. **Areas Page (`/areas`)**
 
 **Currently Hardcoded:**
+
 - ✅ Area list (line 8-17): Hardcoded array with name and description
 - ⚠️ **Should pull from:** `Areas` CMS collection
 
 **CMS Content That Should Be Used:**
+
 - **Areas Collection** - All areas
 - Fields needed:
   - `name` - Area name (e.g., "Baner", "Wakad")
@@ -88,10 +98,12 @@ Create blog posts with:
   - `fullDescription` - Detailed description (can be used in individual area pages)
 
 **📝 Action Items:**
+
 - ⚠️ Areas page needs to be updated to use `useAreas()` hook instead of hardcoded array
 - Create all service areas in CMS
 
 **Content to Add in Admin:**
+
 ```
 Go to: /admin/dashboard/areas
 Create areas with:
@@ -115,10 +127,12 @@ Recommended Areas:
 ### 4. **Projects Page (`/projects`)**
 
 **Dynamic Content (Already Connected):**
+
 - ✅ Channel Partners list via `<PartnersList />` component
 - Shows only `status: 'active'` partners
 
 **CMS Content Used:**
+
 - **Channel Partners Collection** - Only `status: 'active'`
 - Fields displayed:
   - `name` - Partner/builder name
@@ -127,9 +141,11 @@ Recommended Areas:
   - `description` - Partner description (not currently displayed, but available)
 
 **📝 Action Items:**
+
 - ✅ Fully dynamic - just needs content
 
 **Content to Add in Admin:**
+
 ```
 Go to: /admin/dashboard/partners
 Create channel partners with:
@@ -152,9 +168,11 @@ Status: active
 ### 5. **Testimonials Page (`/testimonials`)**
 
 **Dynamic Content (Already Connected):**
+
 - ✅ Testimonials list via `<TestimonialsList />` component
 
 **CMS Content Used:**
+
 - **Testimonials Collection** - All testimonials
 - Fields displayed:
   - `clientName` - Client's name
@@ -164,9 +182,11 @@ Status: active
   - `image` - Client photo (optional, not currently displayed)
 
 **📝 Action Items:**
+
 - ✅ Fully dynamic - just needs content
 
 **Content to Add in Admin:**
+
 ```
 Go to: /admin/dashboard/testimonials
 Create testimonials with:
@@ -188,14 +208,17 @@ Rating: 5
 ### 6. **Contact Page (`/contact`)**
 
 **Currently Hardcoded:**
+
 - ✅ Areas dropdown in form (line 59): Hardcoded array
 - ⚠️ **Should pull from:** `Areas` CMS collection (already using EnquiryForm component)
 
 **Dynamic Content:**
+
 - ✅ EnquiryForm component (should use Areas CMS - needs verification)
 - ❌ Enquiry submissions create Enquiry records (form currently just redirects to WhatsApp)
 
 **CMS Content Used:**
+
 - **Enquiries Collection** - Auto-created when form is submitted
 - Fields:
   - `name` - Enquirer's name
@@ -205,10 +228,12 @@ Rating: 5
   - `createdAt` - Timestamp
 
 **📝 Action Items:**
+
 - ⚠️ EnquiryForm should fetch areas from CMS (check if implemented)
 - ✅ Enquiries are viewable in admin dashboard at `/admin/dashboard/enquiries`
 
 **Content to Add:**
+
 - No manual content needed - enquiries are auto-generated from form submissions
 - Areas dropdown should use Areas CMS (verify implementation)
 
@@ -217,15 +242,18 @@ Rating: 5
 ### 7. **About Page (`/about`)**
 
 **CMS Content Used:**
+
 - ❌ None - Currently fully static/hardcoded
 
 **Static Content:**
+
 - Bio text about Charushila
 - Service types (Residential, Investment)
 - Why choose sections
 - Contact CTAs
 
 **📝 Action Items:**
+
 - No CMS integration needed (static page)
 
 ---
@@ -264,14 +292,17 @@ Rating: 5
 ## 🔧 Code Updates Needed
 
 ### 1. Homepage Areas Section
+
 **File:** `src/app/page.tsx` (line 112-131)
 **Change:** Replace hardcoded areas array with `useAreas()` hook
 
 ### 2. Areas Page
+
 **File:** `src/app/areas/page.tsx` (line 8-17)
 **Change:** Replace hardcoded AREAS array with `useAreas()` hook and display `fullDescription`
 
 ### 3. EnquiryForm Areas
+
 **File:** `src/components/forms/EnquiryForm.tsx`
 **Status:** Check if already using CMS areas - if not, update to use `useAreas()` hook
 
@@ -280,12 +311,14 @@ Rating: 5
 ## ✅ Quick Start Guide
 
 1. **Start with Areas:**
+
    ```
    Go to: /admin/dashboard/areas
    Add all service areas you serve
    ```
 
 2. **Add Channel Partners:**
+
    ```
    Go to: /admin/dashboard/partners
    Add builders/developers you work with
@@ -293,6 +326,7 @@ Rating: 5
    ```
 
 3. **Collect Testimonials:**
+
    ```
    Go to: /admin/dashboard/testimonials
    Add client reviews
@@ -300,6 +334,7 @@ Rating: 5
    ```
 
 4. **Create Blog Content:**
+
    ```
    Go to: /admin/dashboard/blogs
    Write property updates and guides
@@ -318,6 +353,7 @@ Rating: 5
 ## 📊 Content Field Reference
 
 ### Blog Post Fields:
+
 - `title` (string, required)
 - `slug` (string, auto-generated)
 - `excerpt` (string, required)
@@ -331,11 +367,13 @@ Rating: 5
 - `status` (enum: draft | published)
 
 ### Area Fields:
+
 - `name` (string, required)
 - `shortDescription` (string, for list views)
 - `fullDescription` (string, for detail pages)
 
 ### Channel Partner Fields:
+
 - `name` (string, required)
 - `description` (string, optional)
 - `propertyTypes` (array of strings)
@@ -344,6 +382,7 @@ Rating: 5
 - `logo` (string, optional image URL)
 
 ### Testimonial Fields:
+
 - `clientName` (string, required)
 - `area` (string, required)
 - `testimonial` (string, required)
@@ -351,6 +390,7 @@ Rating: 5
 - `image` (string, optional image URL)
 
 ### Enquiry Fields (auto-generated):
+
 - `name` (string)
 - `phone` (string)
 - `requirement` (enum: buy | rent | invest)
