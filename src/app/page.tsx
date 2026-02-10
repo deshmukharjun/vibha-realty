@@ -22,7 +22,7 @@ export default function Home() {
       {/* About Me – headshot, description, and trusted-by logo carousel */}
       <section id="about" className="relative py-20 md:py-28 overflow-hidden scroll-mt-20 bg-(--color-primary)">
         <Container maxWidth="lg">
-          <div className="relative grid grid-cols-1 md:grid-cols-2 gap-14 items-stretch">
+          <div className="relative grid grid-cols-1 md:grid-cols-2 gap-12 items-stretch">
             <div className="order-2 md:order-1 bg-(--color-secondary) border border-(--color-accent) p-6 rounded-xl shadow-sm">
               <h1 className="text-3xl md:text-4xl font-semibold text-gray-900 leading-tight">
                 Charushila Bhalerao
@@ -57,9 +57,9 @@ export default function Home() {
           </div>
 
           {/* New Sections Added Below the Intro Grid */}
-          <div className="mt-16 grid grid-cols-1 md:grid-cols-2 gap-12 border-t border-gray-100 pt-16">
+          <div className="mt-16 grid grid-cols-1 md:grid-cols-2 gap-12 pt-16">
             <div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">Why Vibha Realties</h3>
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">Why Vibha Realties?</h3>
               <div className="space-y-4 text-md text-gray-800 leading-relaxed">
                 <p>
                   Real estate investment has always been a personal pursuit, shaped by first-hand experience as a buyer navigating the market. Those early property journeys revealed critical gaps — lack of transparency, limited advisory thinking, and a transactional mindset that often overlooked the client’s long-term interests.
@@ -68,7 +68,7 @@ export default function Home() {
                   That experience became the catalyst for Vibha Realties.
                 </p>
                 <p>
-                  At Vibha Realties, we operate with a Client-First philosophy, anchored in the belief that every transaction must be a balanced, win–win outcome for both buyer and seller. Real estate decisions are significant — financially and emotionally — and deserve thoughtful guidance rooted in clarity, ethics, and long-term value.
+                  At Vibha Realties, we operate with a Client-First philosophy, anchored in the belief that every transaction must be a balanced, win–win outcome for both buyer and seller. Real estate decisions are significant and deserve thoughtful guidance rooted in clarity, ethics, and long-term value.
                 </p>
                 <p>
                   Our approach goes beyond broking. We position ourselves as trusted advisors, enabling our clients to make confident, well-informed decisions aligned with their personal and investment goals.
@@ -83,13 +83,13 @@ export default function Home() {
                   Founded in 2018, Vibha Realties was established with a clear vision — to offer knowledge-driven, transparent, and ethically grounded real estate advisory in Pune.
                 </p>
                 <p>
-                  To build a strong professional foundation, the founder completed a Post Graduate Programme in Real Estate in 2017, followed by hands-on industry exposure with SquareYards, gaining deep insight into residential, commercial, and investment real estate. This was complemented by RERA certification in 2018, reinforcing a commitment to compliance, governance, and client trust.
+                  To build a strong professional foundation, the founder completed a Post Graduate Programme in Real Estate in 2017, followed by hands-on industry exposure with SquareYards, gaining deep insight into residential, commercial, and investment real estate.
+                </p>
+                <p className="font-medium text-(--color-accent)">
+                  This was complemented by RERA certification in 2018.
                 </p>
                 <p>
                   Over the years, Vibha Realties has evolved into a trusted client partner, working closely with discerning homebuyers, investors, and reputed developers across Pune. Our developer collaborations include Amar Builders, Puranik Builders, Shapoorji Pallonji, Mantra, Godrej, Kalpataru, Yashada, and Kolte Patil, among others.
-                </p>
-                <p>
-                  Each engagement is handled with discretion, personalised attention, and an unwavering focus on long-term value creation.
                 </p>
               </div>
             </div>
