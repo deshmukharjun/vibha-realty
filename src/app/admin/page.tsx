@@ -28,7 +28,7 @@ export default function AdminLogin() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-blue-50 p-4 safe-area-inset-bottom">
+    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-green-50 to-blue-50 p-4 safe-area-inset-bottom">
       <div className="bg-white p-4 sm:p-8 rounded-lg shadow-lg w-full max-w-md">
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Admin Login</h1>
         <p className="text-gray-600 mb-6 text-sm sm:text-base">Vibha Realties CMS</p>
