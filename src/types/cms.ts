@@ -1,3 +1,4 @@
+//src/types/cms.ts
 export interface Area {
   id: string
   name: string
@@ -31,6 +32,25 @@ export interface ListingMedia {
   isPrimary: boolean
 }
 
+/** Feature keys for listing features (icons shown on detail page and in form). */
+export type ListingFeatureKey =
+  | 'bedrooms'
+  | 'bathrooms'
+  | 'parking'
+  | 'balcony'
+  | 'gym'
+  | 'pool'
+  | 'garden'
+  | 'security'
+  | 'power_backup'
+  | 'lift'
+  | 'modular_kitchen'
+  | 'ac'
+  | 'furnished'
+  | 'vaastu'
+  | 'club_house'
+  | 'play_area'
+
 export interface Listing {
   id: string
   ownership: ListingOwnership
@@ -38,13 +58,33 @@ export interface Listing {
   category: ListingCategory
   area: string
   propertyType: string
+  /** Optional display name (e.g. "Land in Baner, Akashay nagar society"). */
+  name?: string
   priceRangeMin?: number
   priceRangeMax?: number
   statusTag?: ListingStatusTag
   adminStatus: ListingAdminStatus
   media: ListingMedia[]
-  /** High-level value line only. No builder, project, address, RERA, plans, brochures. */
+  /** High-level value line / description. */
   valueStatement?: string
+  /** Optional display address / locality (e.g. "Sector 5, Baner"). */
+  address?: string
+  /** Bedrooms count (optional). */
+  bedrooms?: number
+  /** Bathrooms count (optional). */
+  bathrooms?: number
+  /** Parking / car spaces (optional). */
+  parking?: number
+  /** Latitude for map (optional; can be parsed from mapLink). */
+  latitude?: number
+  /** Longitude for map (optional; can be parsed from mapLink). */
+  longitude?: number
+  /** Google Maps URL (optional; use instead of or with lat/lng for "View on map"). */
+  mapLink?: string
+  /** URL to floor plan PDF (uploaded to Cloudinary raw). */
+  floorPlanUrl?: string
+  /** Feature keys for icons (e.g. gym, pool). */
+  features?: ListingFeatureKey[]
   createdAt: string
   updatedAt: string
 }

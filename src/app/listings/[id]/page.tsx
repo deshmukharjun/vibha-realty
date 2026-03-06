@@ -9,7 +9,21 @@ import { formatPriceRangeDisplay } from "@/lib/formatPrice";
 import { WatermarkedImage } from "@/components/listings/WatermarkedImage";
 import { getListingPublic } from "@/hooks/useCMS";
 import type { Listing } from "@/types/cms";
-import { ArrowLeft, Share2, MapPin, Home } from "lucide-react";
+import {
+  ArrowLeft,
+  Share2,
+  MapPin,
+  Home,
+  FileText,
+  Calculator,
+  User,
+  Building2,
+} from "lucide-react";
+import {
+  LISTING_FEATURE_OPTIONS,
+  NUMERIC_FEATURE_KEYS,
+  getFeatureOption,
+} from "@/lib/listingFeatures";
 
 const WHATSAPP_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "919881199152";
 
@@ -47,11 +61,27 @@ function useListing(id: string | undefined) {
   return { listing, error };
 }
 
+/**
+ * EMI = P * r * (1+r)^n / ((1+r)^n - 1).
+ * principalRupees: loan amount in rupees.
+ * Returns monthly EMI in rupees.
+ */
+function emi(principalRupees: number, annualRatePercent: number, tenureYears: number): number {
+  const P = principalRupees;
+  const r = annualRatePercent / 100 / 12;
+  const n = tenureYears * 12;
+  if (r === 0) return P / n;
+  return (P * r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+}
+
 export default function ListingDetailPage() {
   const params = useParams();
   const id = params?.id as string | undefined;
   const { listing, error } = useListing(id);
   const [galleryIndex, setGalleryIndex] = useState(0);
+  const [emiDownPaymentPercent, setEmiDownPaymentPercent] = useState(20);
+  const [emiTenure, setEmiTenure] = useState(20);
+  const [emiRate, setEmiRate] = useState(8.5);
 
   if (listing === undefined && !error) {
     return (
@@ -100,7 +130,22 @@ export default function ListingDetailPage() {
     }
   };
 
-  const title = `${listing.area} – ${listing.propertyType}`;
+  const title = listing.name?.trim() || `${listing.area} – ${listing.propertyType}`;
+  const hasLatLng = listing.latitude != null && listing.longitude != null;
+  const mapUrl =
+    listing.mapLink?.trim() ||
+    (hasLatLng ? `https://www.google.com/maps?q=${listing.latitude},${listing.longitude}` : undefined);
+
+  // Listing prices are stored in rupees (e.g. 90L = 9_000_000)
+  const priceForEmiRupees = listing.priceRangeMax ?? listing.priceRangeMin ?? 0;
+  const loanPercent = 100 - emiDownPaymentPercent;
+  const loanPrincipalRupees = Math.round((priceForEmiRupees * loanPercent) / 100);
+  const downPaymentRupees = Math.round((priceForEmiRupees * emiDownPaymentPercent) / 100);
+  const monthlyEmi = emi(loanPrincipalRupees, emiRate, emiTenure);
+  const LAKHS = 100_000;
+  const priceLakhs = priceForEmiRupees / LAKHS;
+  const loanLakhs = loanPrincipalRupees / LAKHS;
+  const downPaymentLakhs = downPaymentRupees / LAKHS;
 
   return (
     <div className="bg-(--color-primary) min-h-screen">
@@ -127,16 +172,41 @@ export default function ListingDetailPage() {
       </div>
 
       <Container maxWidth="lg" className="py-6 md:py-10">
+        {/* Ownership badge */}
+        <div className="mb-3">
+          <span
+            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-medium ${
+              listing.ownership === "channel-partner"
+                ? "bg-indigo-100 text-indigo-800"
+                : "bg-green-100 text-green-800"
+            }`}
+          >
+            {listing.ownership === "channel-partner" ? (
+              <>
+                <Building2 className="w-4 h-4" /> Channel partner listing
+              </>
+            ) : (
+              <>
+                <User className="w-4 h-4" /> Private listing
+              </>
+            )}
+          </span>
+        </div>
+
         {/* Hero: title, price, meta */}
         <div className="mb-6 md:mb-8">
           <h1 className="text-2xl md:text-3xl font-bold text-gray-900 leading-tight">
             {title}
           </h1>
+          {(listing.address || listing.area) && (
+            <div className="mt-2 flex flex-wrap items-center gap-3 text-gray-600">
+              <span className="inline-flex items-center gap-1.5">
+                <MapPin className="w-4 h-4 text-green-600 shrink-0" />
+                {listing.address ? `${listing.address}, ${listing.area}` : listing.area}
+              </span>
+            </div>
+          )}
           <div className="mt-2 flex flex-wrap items-center gap-3 text-gray-600">
-            <span className="inline-flex items-center gap-1.5">
-              <MapPin className="w-4 h-4 text-green-600" />
-              {listing.area}
-            </span>
             <span className="inline-flex items-center gap-1.5">
               <Home className="w-4 h-4 text-green-600" />
               {listing.propertyType}
@@ -153,15 +223,19 @@ export default function ListingDetailPage() {
         </div>
 
         {/* Media gallery */}
-        <section className="mb-8 md:mb-12" aria-label="Property images">
+        <section className="mb-8 md:mb-10" aria-label="Property images">
           <div className="rounded-xl border border-gray-200 overflow-hidden bg-gray-100">
-            <div className="relative aspect-4/3 w-full">
+            <div className="relative aspect-[4/3] w-full">
               {activeMedia?.type === "video" ? (
                 <video
                   src={activeMedia.url}
                   controls
                   className="w-full h-full object-cover"
-                  poster={primaryMedia?.type === "image" ? toHighResListingImageUrl(primaryMedia.url) : undefined}
+                  poster={
+                    primaryMedia?.type === "image"
+                      ? toHighResListingImageUrl(primaryMedia.url)
+                      : undefined
+                  }
                 />
               ) : activeMedia ? (
                 <WatermarkedImage
@@ -189,7 +263,9 @@ export default function ListingDetailPage() {
                     type="button"
                     onClick={() => setGalleryIndex(i)}
                     className={`shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-colors ${
-                      i === galleryIndex ? "border-green-600" : "border-gray-200 hover:border-gray-300"
+                      i === galleryIndex
+                        ? "border-green-600"
+                        : "border-gray-200 hover:border-gray-300"
                     }`}
                   >
                     {m.type === "video" ? (
@@ -212,17 +288,67 @@ export default function ListingDetailPage() {
           </div>
         </section>
 
-        {/* Property highlights / description */}
+        {/* Features with icons */}
+        <section className="mb-8 md:mb-10 rounded-xl border border-gray-200 p-6 bg-white">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">Features</h2>
+          <div className="flex flex-wrap gap-4">
+            {NUMERIC_FEATURE_KEYS.map((key) => {
+              const val =
+                key === "bedrooms"
+                  ? listing.bedrooms
+                  : key === "bathrooms"
+                    ? listing.bathrooms
+                    : listing.parking;
+              if (val == null) return null;
+              const opt = getFeatureOption(key);
+              if (!opt) return null;
+              const Icon = opt.icon;
+              return (
+                <div
+                  key={key}
+                  className="flex items-center gap-2 rounded-lg bg-gray-50 px-4 py-2 border border-gray-100"
+                >
+                  <Icon className="w-5 h-5 text-green-600" />
+                  <span className="text-sm font-medium text-gray-900">
+                    {val} {opt.label}
+                  </span>
+                </div>
+              );
+            })}
+            {(listing.features ?? [])
+              .filter((k) => !NUMERIC_FEATURE_KEYS.includes(k))
+              .map((key) => {
+                const opt = getFeatureOption(key);
+                if (!opt) return null;
+                const Icon = opt.icon;
+                return (
+                  <div
+                    key={key}
+                    className="flex items-center gap-2 rounded-lg bg-gray-50 px-4 py-2 border border-gray-100"
+                  >
+                    <Icon className="w-5 h-5 text-green-600" />
+                    <span className="text-sm font-medium text-gray-900">{opt.label}</span>
+                  </div>
+                );
+              })}
+          </div>
+          {(!listing.bedrooms && !listing.bathrooms && !listing.parking && (!listing.features || listing.features.length === 0)) && (
+            <p className="text-sm text-gray-500">No features added for this listing.</p>
+          )}
+        </section>
+
+        {/* Property description */}
         {(listing.valueStatement || listing.area) && (
-          <section className="mb-8 md:mb-12">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Property highlights</h2>
+          <section className="mb-8 md:mb-10">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">Description</h2>
             <div className="prose prose-gray max-w-none text-gray-700">
               {listing.valueStatement ? (
                 <p className="whitespace-pre-wrap">{listing.valueStatement}</p>
               ) : (
                 <p>
-                  {listing.propertyType} in {listing.area}. {formatPriceRangeDisplay(listing.priceRangeMin, listing.priceRangeMax)}.
-                  Get in touch for full details, visit, or inspection.
+                  {listing.propertyType} in {listing.area}.{" "}
+                  {formatPriceRangeDisplay(listing.priceRangeMin, listing.priceRangeMax)}. Get
+                  in touch for full details, visit, or inspection.
                 </p>
               )}
             </div>
@@ -230,7 +356,7 @@ export default function ListingDetailPage() {
         )}
 
         {/* Key details */}
-        <section className="mb-8 md:mb-12 rounded-xl border border-gray-200 p-6 bg-(--color-secondary)/50">
+        <section className="mb-8 md:mb-10 rounded-xl border border-gray-200 p-6 bg-(--color-secondary)/50">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Key details</h2>
           <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
             <div>
@@ -258,19 +384,162 @@ export default function ListingDetailPage() {
           </dl>
         </section>
 
+        {/* Location / Map */}
+        {mapUrl && (
+          <section className="mb-8 md:mb-10 rounded-xl border border-gray-200 overflow-hidden bg-white">
+            <h2 className="text-lg font-semibold text-gray-900 p-4 pb-0">Location</h2>
+            <p className="text-sm text-gray-600 px-4 pt-1">
+              {listing.address ? `${listing.address}, ${listing.area}` : listing.area}
+            </p>
+            <a
+              href={mapUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-4 flex items-center justify-center gap-2 py-4 px-4 bg-gray-50 border-t border-gray-200 text-green-700 font-medium hover:bg-gray-100"
+            >
+              <MapPin className="w-5 h-5" /> View on Google Maps
+            </a>
+            {hasLatLng && (
+              <iframe
+                title="Map"
+                src={`https://www.google.com/maps?q=${listing.latitude},${listing.longitude}&z=15&output=embed`}
+                className="w-full h-64 border-0"
+                allowFullScreen
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+              />
+            )}
+          </section>
+        )}
+
+        {/* Floor plan */}
+        {listing.floorPlanUrl && (
+          <section className="mb-8 md:mb-10 rounded-xl border border-gray-200 p-6 bg-white">
+            <h2 className="text-lg font-semibold text-gray-900 mb-2 flex items-center gap-2">
+              <FileText className="w-5 h-5 text-green-600" /> Floor plan
+            </h2>
+            <a
+              href={listing.floorPlanUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 rounded-lg border-2 border-green-600 px-4 py-2 text-green-700 font-medium hover:bg-green-50"
+            >
+              <FileText className="w-4 h-4" /> View floor plan (PDF)
+            </a>
+          </section>
+        )}
+
+        {/* EMI calculator */}
+        {(listing.priceRangeMin != null || listing.priceRangeMax != null) && (
+          <section className="mb-8 md:mb-10 rounded-xl border border-gray-200 p-6 bg-white">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+              <Calculator className="w-5 h-5 text-green-600" /> EMI calculator
+            </h2>
+            <p className="text-sm text-gray-600 mb-4">
+              Property value: ₹{priceLakhs >= 1 ? priceLakhs.toLocaleString("en-IN", { maximumFractionDigits: 1 }) : priceLakhs.toFixed(1)} lakh. Adjust down payment and loan split below. For exact figures, consult your bank.
+            </p>
+
+            <div className="mb-6">
+              <div className="flex justify-between text-sm mb-2">
+                <span className="font-medium text-gray-700">Down payment</span>
+                <span className="text-green-700 font-semibold">{emiDownPaymentPercent}%</span>
+              </div>
+              <input
+                type="range"
+                min={10}
+                max={50}
+                step={5}
+                value={emiDownPaymentPercent}
+                onChange={(e) => setEmiDownPaymentPercent(Number(e.target.value))}
+                className="w-full h-2.5 rounded-lg appearance-none bg-gray-200 accent-green-600 cursor-pointer"
+                aria-label="Down payment percentage"
+              />
+              <div className="flex justify-between text-xs text-gray-500 mt-1">
+                <span>10%</span>
+                <span>50%</span>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4 mb-4 text-sm">
+              <div className="rounded-lg bg-gray-50 border border-gray-200 p-3">
+                <p className="text-gray-500 font-medium">Down payment</p>
+                <p className="text-gray-900 font-semibold mt-0.5">
+                  ₹{downPaymentLakhs >= 1 ? downPaymentLakhs.toLocaleString("en-IN", { maximumFractionDigits: 1 }) : downPaymentLakhs.toFixed(1)} lakh
+                </p>
+                <p className="text-xs text-gray-500">{emiDownPaymentPercent}% of value</p>
+              </div>
+              <div className="rounded-lg bg-green-50 border border-green-200 p-3">
+                <p className="text-green-700 font-medium">Loan amount</p>
+                <p className="text-green-900 font-semibold mt-0.5">
+                  ₹{loanLakhs >= 1 ? loanLakhs.toLocaleString("en-IN", { maximumFractionDigits: 1 }) : loanLakhs.toFixed(1)} lakh
+                </p>
+                <p className="text-xs text-green-600">{loanPercent}% of value</p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Loan tenure (years)
+                </label>
+                <select
+                  value={emiTenure}
+                  onChange={(e) => setEmiTenure(Number(e.target.value))}
+                  className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 text-sm"
+                >
+                  {[5, 10, 15, 20, 25, 30].map((y) => (
+                    <option key={y} value={y}>
+                      {y} years
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Interest rate (% p.a.)
+                </label>
+                <select
+                  value={emiRate}
+                  onChange={(e) => setEmiRate(Number(e.target.value))}
+                  className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 text-sm"
+                >
+                  {[7.5, 8, 8.5, 9, 9.5, 10].map((r) => (
+                    <option key={r} value={r}>
+                      {r}%
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            <div className="rounded-lg bg-green-50 border border-green-200 p-4">
+              <p className="text-sm text-gray-600">Estimated EMI (₹/month)</p>
+              <p className="text-2xl font-bold text-green-800">
+                ₹{Math.round(monthlyEmi).toLocaleString("en-IN")}
+              </p>
+              <p className="text-xs text-gray-500 mt-1">
+                On loan of ₹{loanLakhs >= 1 ? loanLakhs.toLocaleString("en-IN", { maximumFractionDigits: 1 }) : loanLakhs.toFixed(1)} lakh ({loanPercent}%) over {emiTenure} years at {emiRate}% p.a.
+              </p>
+            </div>
+          </section>
+        )}
+
         {/* Disclaimer */}
         <section className="mb-8 text-xs text-gray-500 border-t border-gray-200 pt-6">
           <p>
-            All information contained herein is gathered from sources we deem reliable. We do not guarantee its accuracy.
-            Interested persons should rely on their own enquiries. Figures and details are subject to change without notice.
+            All information contained herein is gathered from sources we deem reliable. We
+            do not guarantee its accuracy. Interested persons should rely on their own
+            enquiries. Figures and details are subject to change without notice.
           </p>
         </section>
 
         {/* Contact CTA */}
         <section className="rounded-xl border-2 border-green-600 bg-green-50/50 p-6 md:p-8">
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">Interested in this property?</h2>
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">
+            Interested in this property?
+          </h2>
           <p className="text-gray-700 mb-6">
-            Reach out to Charushila for more details, site visit, or to discuss this listing.
+            Reach out to Charushila for more details, site visit, or to discuss this
+            listing.
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
             <a

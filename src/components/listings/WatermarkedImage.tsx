@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import { WATERMARK_LINE1, WATERMARK_LINE2 } from "@/lib/watermark";
 
 interface WatermarkedImageProps {
   src: string;
@@ -15,8 +14,8 @@ interface WatermarkedImageProps {
 }
 
 /**
- * Renders a listing image with mandatory watermark overlay.
- * PRD: All listing images must show "Vibha Realty - 98811 99152".
+ * Renders a listing image. Watermark is baked in at upload time (centered, 10% opacity).
+ * No overlay is applied here to avoid double watermarks.
  */
 export function WatermarkedImage({
   src,
@@ -40,17 +39,6 @@ export function WatermarkedImage({
         sizes={sizes}
         priority={priority}
       />
-      <div
-        className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none text-center"
-        aria-hidden
-      >
-        <span className="text-white font-bold text-2xl sm:text-3xl md:text-4xl lg:text-5xl opacity-35 leading-tight">
-          {WATERMARK_LINE1}
-        </span>
-        <span className="text-white font-bold text-2xl sm:text-3xl md:text-4xl lg:text-5xl opacity-35 leading-tight">
-          {WATERMARK_LINE2}
-        </span>
-      </div>
     </div>
   );
 }

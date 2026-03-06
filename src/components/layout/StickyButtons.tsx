@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "../ui/Button";
-import { openWhatsApp, createWhatsAppMessage, createCallLink } from "@/lib/whatsapp";
+import { openWhatsApp } from "@/lib/whatsapp";
 import { Phone } from "lucide-react";
 import Image from "next/image";
 

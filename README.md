@@ -30,5 +30,6 @@ A modern real estate website built with Next.js and Firebase CMS for managing pr
 ## Documentation
 
 - See `SETUP_INSTRUCTIONS.md` for detailed setup
+- See `CLOUDINARY_SETUP.md` for listing image uploads (Cloudinary)
 - See `FIRESTORE_RULES.md` for Firebase security rules
 - See `CMS_CONTENT_MAPPING.md` for content management guide

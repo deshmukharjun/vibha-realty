@@ -55,7 +55,9 @@ export function ListingCard({ listing }: ListingCardProps) {
         </div>
         <div className="p-4 sm:p-5">
           <p className="text-xs font-medium uppercase tracking-wider text-green-600">{listing.area}</p>
-          <p className="text-gray-900 font-semibold mt-1 text-sm sm:text-base line-clamp-1">{listing.propertyType}</p>
+          <p className="text-gray-900 font-semibold mt-1 text-sm sm:text-base line-clamp-1">
+            {listing.name?.trim() || listing.propertyType}
+          </p>
           <p className="text-xs sm:text-sm text-gray-600 mt-0.5">{formatPriceRangeDisplay(listing.priceRangeMin, listing.priceRangeMax)}</p>
         </div>
       </Link>
