@@ -48,7 +48,7 @@ export default function Home() {
             </div>
             <div className="order-1 md:order-2 relative h-full min-h-100 md:min-h-125">
               <Image
-                src="/headshot.jpeg"
+                src="/headshot_blur.png"
                 alt="Charushila Bhalerao – Pune Real Estate Consultant"
                 fill
                 className="rounded-2xl object-cover border border-(--color-accent) shadow-[0_20px_40px_rgba(0,0,0,0.12)]"

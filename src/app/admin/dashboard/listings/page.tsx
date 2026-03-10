@@ -60,7 +60,6 @@ export default function ListingsPage() {
               <th className="px-3 md:px-6 py-3 text-left text-xs md:text-sm font-semibold text-gray-900">Type</th>
               <th className="px-3 md:px-6 py-3 text-left text-xs md:text-sm font-semibold text-gray-900">Category</th>
               <th className="px-3 md:px-6 py-3 text-left text-xs md:text-sm font-semibold text-gray-900">Ownership</th>
-              <th className="px-3 md:px-6 py-3 text-left text-xs md:text-sm font-semibold text-gray-900">Transaction</th>
               <th className="px-3 md:px-6 py-3 text-left text-xs md:text-sm font-semibold text-gray-900">Status</th>
               <th className="px-3 md:px-6 py-3 text-right text-xs md:text-sm font-semibold text-gray-900">Actions</th>
             </tr>
@@ -68,7 +67,7 @@ export default function ListingsPage() {
           <tbody>
             {listings.length === 0 ? (
               <tr>
-                <td colSpan={8} className="px-4 md:px-6 py-12 text-center text-gray-500 text-sm">
+                <td colSpan={7} className="px-4 md:px-6 py-12 text-center text-gray-500 text-sm">
                   No listings yet. Add one to show on the homepage.
                 </td>
               </tr>
@@ -116,7 +115,6 @@ export default function ListingsPage() {
                       {listing.ownership === 'personal' ? 'Personal' : (listing.channelPartner ?? 'Channel Partner')}
                     </span>
                   </td>
-                  <td className="px-3 md:px-6 py-3 md:py-4 capitalize text-gray-700 text-sm">{listing.transactionType}</td>
                   <td className="px-3 md:px-6 py-3 md:py-4">
                     <select
                       value={listing.adminStatus}

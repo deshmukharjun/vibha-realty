@@ -345,8 +345,16 @@ export default function ListingDetailPage() {
                   </div>
                 );
               })}
+            {((listing as { featuresOther?: string[] }).featuresOther ?? []).map((name) => (
+              <div
+                key={name}
+                className="flex items-center gap-2 rounded-lg bg-gray-50 px-4 py-2 border border-gray-100"
+              >
+                <span className="text-sm font-medium text-gray-900">{name}</span>
+              </div>
+            ))}
           </div>
-          {(!listing.bedrooms && !listing.bathrooms && !listing.parking && (!listing.features || listing.features.length === 0)) && (
+          {(!listing.bedrooms && !listing.bathrooms && !listing.parking && (!listing.features || listing.features.length === 0) && !((listing as { featuresOther?: string[] }).featuresOther?.length)) && (
             <p className="text-sm text-gray-500">No features added for this listing.</p>
           )}
         </section>
@@ -384,10 +392,6 @@ export default function ListingDetailPage() {
             <div>
               <dt className="text-gray-500 font-medium">Category</dt>
               <dd className="text-gray-900 mt-0.5 capitalize">{listing.category}</dd>
-            </div>
-            <div>
-              <dt className="text-gray-500 font-medium">Listing type</dt>
-              <dd className="text-gray-900 mt-0.5 capitalize">{listing.transactionType}</dd>
             </div>
             <div>
               <dt className="text-gray-500 font-medium">Price</dt>

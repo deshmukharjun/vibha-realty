@@ -5,7 +5,7 @@ import { Search, SlidersHorizontal, ChevronLeft, ChevronRight } from "lucide-rea
 import { useListings } from "@/hooks/useCMS";
 import { ListingCard } from "./ListingCard";
 import { ListingFilterModal, type ListingFilters } from "./ListingFilterModal";
-import type { ListingCategory, ListingTransactionType } from "@/types/cms";
+import type { ListingCategory } from "@/types/cms";
 
 const CATEGORIES: { value: ListingCategory | undefined; label: string }[] = [
   { value: undefined, label: "All" },
@@ -74,20 +74,23 @@ function EmptyState({ message }: { message: string }) {
  */
 export function ListingHero() {
   const [category, setCategory] = useState<ListingCategory | undefined>(undefined);
-  const [transactionType, setTransactionType] = useState<ListingTransactionType | undefined>("buying");
   const [searchQuery, setSearchQuery] = useState("");
   const [filterModalOpen, setFilterModalOpen] = useState(false);
   const [appliedFilters, setAppliedFilters] = useState<ListingFilters | null>(null);
   const exploreRef = useRef<HTMLDivElement>(null);
-  const { personal, channelPartner, loading, error } = useListings(
-    {
-      category,
-      transactionType,
-      priceMin: appliedFilters?.priceMin,
-      priceMax: appliedFilters?.priceMax,
-      areaSearch: searchQuery,
-    }
-  );
+  const { personal, channelPartner, loading, error } = useListings({
+    category,
+    priceMin: appliedFilters?.priceMin,
+    priceMax: appliedFilters?.priceMax,
+    areaSearch: searchQuery,
+    outdoor: appliedFilters?.outdoor,
+    indoor: appliedFilters?.indoor,
+    climate: appliedFilters?.climate,
+    accessibility: appliedFilters?.accessibility,
+    keywords: appliedFilters?.keywords,
+    bedroomsMin: appliedFilters?.bedroomsMin,
+    bedroomsMax: appliedFilters?.bedroomsMax,
+  });
 
   const scrollToExplore = () => {
     exploreRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -160,9 +163,7 @@ export function ListingHero() {
             onClose={() => setFilterModalOpen(false)}
             filters={appliedFilters ?? { outdoor: [], indoor: [], climate: [], accessibility: [], keywords: "" }}
             onApply={(f) => setAppliedFilters(f)}
-            transactionType={transactionType}
             category={category}
-            onTransactionTypeChange={setTransactionType}
             onCategoryChange={(v) => setCategory(v)}
           />
 

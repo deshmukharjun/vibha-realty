@@ -98,6 +98,8 @@ export interface Listing {
   floorPlanUrl?: string
   /** Feature keys for icons (e.g. gym, pool). */
   features?: ListingFeatureKey[]
+  /** Custom facility names when "Other" is used (free text). */
+  featuresOther?: string[]
   createdAt: string
   updatedAt: string
 }

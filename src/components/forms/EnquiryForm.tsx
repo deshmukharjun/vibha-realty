@@ -2,11 +2,9 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/Button";
-import { openWhatsApp, createWhatsAppMessage } from "@/lib/whatsapp";
 import { addEnquiry } from "@/hooks/useCMS";
 import { db } from '@/lib/firebase';
 import { collection, addDoc } from 'firebase/firestore';
-import Image from "next/image";
 import type { EnquiryRequirement } from "@/types/cms";
 
 interface EnquiryFormProps {
@@ -125,24 +123,6 @@ export function EnquiryForm({ areas = [], whatsappNumber }: EnquiryFormProps) {
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleSendWhatsApp = (e: React.MouseEvent) => {
-    e.preventDefault();
-    if (!formData.name || !formData.phone) return;
-    const reqList = [
-      ...formData.requirements,
-      ...(formData.requirementOther.trim() ? [formData.requirementOther.trim()] : []),
-    ];
-    const areasList = [...areasWithOther];
-    if (formData.areaOther.trim()) areasList.push(formData.areaOther.trim());
-    const message = createWhatsAppMessage(
-      formData.name,
-      reqList,
-      areasList,
-      resolvedBudget.trim() || undefined
-    );
-    openWhatsApp(whatsappNumber, message);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -329,7 +309,7 @@ export function EnquiryForm({ areas = [], whatsappNumber }: EnquiryFormProps) {
                   budgetCustomUnit: e.target.value as "lakh" | "crore",
                 }))
               }
-              className="px-4 py-2 border border-(--color-accent) rounded-lg text-gray-700 min-w-[100px]"
+              className="px-4 py-2 border border-(--color-accent) rounded-lg text-gray-700 min-w-25"
             >
               <option value="lakh">Lakh</option>
               <option value="crore">Crore</option>
@@ -341,15 +321,6 @@ export function EnquiryForm({ areas = [], whatsappNumber }: EnquiryFormProps) {
       <div className="flex flex-col gap-3">
         <Button type="submit" variant="primary" fullWidth disabled={loading} className="bg-(--color-accent)">
           {loading ? "Submitting..." : submitSuccess ? "✓ Submitted!" : "Submit Enquiry"}
-        </Button>
-        <Button
-          type="button"
-          variant="primary"
-          fullWidth
-          onClick={handleSendWhatsApp}
-          className="gap-2 bg-(--color-accent)"
-        >
-          <Image src="/whatsapp.svg" alt="WhatsApp" width={22} height={22} /> Send on WhatsApp
         </Button>
       </div>
     </form>

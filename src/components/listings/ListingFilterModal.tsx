@@ -2,13 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { X, ChevronDown, ChevronUp } from "lucide-react";
-import type { ListingCategory, ListingTransactionType } from "@/types/cms";
-
-const TRANSACTION_OPTIONS: { value: ListingTransactionType | "rent"; label: string }[] = [
-  { value: "buying", label: "Buy" },
-  { value: "rent", label: "Rent" },
-  { value: "selling", label: "Sold" },
-];
+import type { ListingCategory } from "@/types/cms";
 
 const PROPERTY_TYPES: { value: string; label: string; category?: ListingCategory }[] = [
   { value: "", label: "All types" },
@@ -42,7 +36,6 @@ const SALE_METHODS = [
 ];
 
 export interface ListingFilters {
-  transactionType?: ListingTransactionType;
   category?: ListingCategory;
   priceMin?: number;
   priceMax?: number;
@@ -75,9 +68,7 @@ interface ListingFilterModalProps {
   onClose: () => void;
   filters: ListingFilters;
   onApply: (filters: ListingFilters) => void;
-  transactionType: ListingTransactionType | undefined;
   category: ListingCategory | undefined;
-  onTransactionTypeChange: (v: ListingTransactionType | undefined) => void;
   onCategoryChange: (v: ListingCategory | undefined) => void;
 }
 
@@ -111,14 +102,9 @@ export function ListingFilterModal({
   onClose,
   filters,
   onApply,
-  transactionType,
   category,
-  onTransactionTypeChange,
   onCategoryChange,
 }: ListingFilterModalProps) {
-  const [localTransaction, setLocalTransaction] = useState<ListingTransactionType | "rent">(
-    transactionType ?? "buying"
-  );
   const [localCategory, setLocalCategory] = useState<string>(
     !category ? "" : category === "land" ? "land" : category === "commercial" ? "commercial" : "residential"
   );
@@ -142,7 +128,6 @@ export function ListingFilterModal({
 
   useEffect(() => {
     if (open) {
-      setLocalTransaction(transactionType ?? "buying");
       setLocalCategory(!category ? "" : category === "land" ? "land" : category === "commercial" ? "commercial" : "residential");
       setPriceMin(filters.priceMin != null ? String(filters.priceMin) : "");
       setPriceMax(filters.priceMax != null ? String(filters.priceMax) : "");
@@ -152,7 +137,7 @@ export function ListingFilterModal({
       setAccessibility(filters.accessibility ?? []);
       setKeywords(filters.keywords ?? "");
     }
-  }, [open, transactionType, category, filters.priceMin, filters.priceMax, filters.outdoor, filters.indoor, filters.climate, filters.accessibility, filters.keywords]);
+  }, [open, category, filters.priceMin, filters.priceMax, filters.outdoor, filters.indoor, filters.climate, filters.accessibility, filters.keywords]);
 
   const toggle = (arr: string[], item: string, set: (a: string[]) => void) => {
     if (arr.includes(item)) set(arr.filter((x) => x !== item));
@@ -160,7 +145,6 @@ export function ListingFilterModal({
   };
 
   const handleClear = () => {
-    setLocalTransaction("buying");
     setLocalCategory("");
     setPriceMin("");
     setPriceMax("");
@@ -184,18 +168,16 @@ export function ListingFilterModal({
   const handleSearch = () => {
     const cat: ListingCategory | undefined =
       localCategory === "" ? undefined : (localCategory === "land" ? "land" : localCategory === "commercial" ? "commercial" : "residential");
-    const tx: ListingTransactionType | undefined =
-      localTransaction === "buying" || localTransaction === "selling" ? localTransaction : undefined;
     const pMin = priceMin ? Number(priceMin) : undefined;
     const pMax = priceMax ? Number(priceMax) : undefined;
-    onTransactionTypeChange(tx);
     onCategoryChange(cat);
     onApply({
       ...defaultFilters,
-      transactionType: tx,
       category: cat as ListingCategory | undefined,
       priceMin: pMin,
       priceMax: pMax,
+      bedroomsMin: bedMin ? Number(bedMin) : undefined,
+      bedroomsMax: bedMax ? Number(bedMax) : undefined,
       outdoor,
       indoor,
       climate,
@@ -236,32 +218,6 @@ export function ListingFilterModal({
         </div>
 
         <div className="p-4 space-y-1">
-          {/* Buy / Rent / Sold */}
-          <div className="py-3 border-b border-gray-200">
-            <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
-              Transaction
-            </p>
-            <div className="flex flex-wrap gap-2">
-              {TRANSACTION_OPTIONS.map((o) => (
-                <button
-                  key={o.label}
-                  type="button"
-                  onClick={() => setLocalTransaction(o.value)}
-                  className={`rounded-lg border-2 px-4 py-2 text-sm font-medium transition-colors ${
-                    localTransaction === o.value
-                      ? "border-(--color-accent) bg-(--color-accent) text-white"
-                      : "border-gray-200 bg-(--color-primary) text-gray-700 hover:border-gray-300"
-                  }`}
-                >
-                  {o.label}
-                </button>
-              ))}
-            </div>
-            {localTransaction === "rent" && (
-              <p className="text-xs text-gray-500 mt-1">Rent listings coming soon. Showing all for now.</p>
-            )}
-          </div>
-
           {/* Property type */}
           <div className="py-3 border-b border-gray-200">
             <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">

@@ -35,9 +35,15 @@ export default function EnquiriesPage() {
   const getRequirementList = (e: Enquiry): string[] => {
     const r = (e as { requirement?: string | string[] }).requirement
     const list = Array.isArray(r) ? r : r ? [r] : []
-    const other = (e as { requirementOther?: string }).requirementOther
-    if (other?.trim()) list.push(other.trim())
-    return list
+    const other = (e as { requirementOther?: string }).requirementOther?.trim()
+    const seen = new Set<string>()
+    const out: string[] = []
+    for (const x of list) {
+      const s = String(x).trim()
+      if (s && !seen.has(s)) { seen.add(s); out.push(s) }
+    }
+    if (other && !seen.has(other)) out.push(other)
+    return out
   }
 
   const getAreaList = (e: Enquiry): string[] => {

@@ -6,7 +6,6 @@ import { useAreas } from "@/hooks/useCMS";
 import type {
   Listing,
   ListingCategory,
-  ListingTransactionType,
   ListingOwnership,
   ListingStatusTag,
   ListingAdminStatus,
@@ -32,11 +31,6 @@ const PROPERTY_TYPE_OPTIONS: { value: string; label: string; category: ListingCa
   { value: "Block Of Units", label: "Block Of Units", category: "commercial" },
   { value: "Commercial", label: "Commercial", category: "commercial" },
   { value: "Other", label: "Other", category: "residential" },
-];
-
-const TRANSACTION_OPTIONS: { value: ListingTransactionType; label: string }[] = [
-  { value: "buying", label: "Buy" },
-  { value: "selling", label: "Sold" },
 ];
 
 const OWNERSHIP_OPTIONS: { value: ListingOwnership; label: string }[] = [
@@ -68,8 +62,8 @@ const ADMIN_STATUS_OPTIONS: { value: ListingAdminStatus; label: string }[] = [
   { value: "hidden", label: "Hidden" },
 ];
 
-function lakhsToPaise(l: number): number {
-  return l * 1_00_000;
+function toPaise(value: number, unit: 'lakh' | 'crore'): number {
+  return unit === 'crore' ? value * 1_00_00_000 : value * 1_00_000;
 }
 function paiseToLakhs(p: number): number {
   return p / 1_00_000;
@@ -78,7 +72,6 @@ function paiseToLakhs(p: number): number {
 export interface ListingFormValues {
   ownership: ListingOwnership;
   channelPartner: ChannelPartnerName | "";
-  transactionType: ListingTransactionType;
   category: ListingCategory;
   propertyType: string;
   area: string;
@@ -91,7 +84,9 @@ export interface ListingFormValues {
   latitude: string;
   longitude: string;
   priceRangeMinLakhs: string;
+  priceRangeMinUnit: 'lakh' | 'crore';
   priceRangeMaxLakhs: string;
+  priceRangeMaxUnit: 'lakh' | 'crore';
   statusTag: ListingStatusTag | "";
   adminStatus: ListingAdminStatus;
   mediaUrls: string[];
@@ -100,13 +95,13 @@ export interface ListingFormValues {
   floorPlanUrl: string;
   floorPlanFile: File | null;
   features: ListingFeatureKey[];
+  featuresOther: string[];
   valueStatement: string;
 }
 
 const defaultValues: ListingFormValues = {
   ownership: "personal",
   channelPartner: "",
-  transactionType: "buying",
   category: "residential",
   propertyType: "Apartment & Unit",
   area: "",
@@ -119,7 +114,9 @@ const defaultValues: ListingFormValues = {
   latitude: "",
   longitude: "",
   priceRangeMinLakhs: "",
+  priceRangeMinUnit: "lakh",
   priceRangeMaxLakhs: "",
+  priceRangeMaxUnit: "lakh",
   statusTag: "",
   adminStatus: "active",
   mediaUrls: [""],
@@ -128,6 +125,7 @@ const defaultValues: ListingFormValues = {
   floorPlanUrl: "",
   floorPlanFile: null,
   features: [],
+  featuresOther: [],
   valueStatement: "",
 };
 
@@ -143,7 +141,6 @@ function listingToFormValues(l: Listing): ListingFormValues {
   return {
     ownership: l.ownership,
     channelPartner: l.channelPartner ?? "",
-    transactionType: l.transactionType,
     category: l.category,
     propertyType: l.propertyType,
     area: l.area,
@@ -156,7 +153,9 @@ function listingToFormValues(l: Listing): ListingFormValues {
     latitude: l.latitude != null ? String(l.latitude) : "",
     longitude: l.longitude != null ? String(l.longitude) : "",
     priceRangeMinLakhs: l.priceRangeMin != null ? String(paiseToLakhs(l.priceRangeMin)) : "",
+    priceRangeMinUnit: "lakh",
     priceRangeMaxLakhs: l.priceRangeMax != null ? String(paiseToLakhs(l.priceRangeMax)) : "",
+    priceRangeMaxUnit: "lakh",
     statusTag: l.statusTag ?? "",
     adminStatus: l.adminStatus,
     mediaUrls: imageUrls.length ? imageUrls : [""],
@@ -165,6 +164,7 @@ function listingToFormValues(l: Listing): ListingFormValues {
     floorPlanUrl: l.floorPlanUrl ?? "",
     floorPlanFile: null,
     features: l.features ?? [],
+    featuresOther: (l as { featuresOther?: string[] }).featuresOther ?? [],
     valueStatement: l.valueStatement ?? "",
   };
 }
@@ -174,8 +174,8 @@ function formValuesToListingPayload(
   resolvedFloorPlanUrl?: string,
   resolvedVideoUrls?: string[]
 ): Omit<Listing, "id" | "createdAt" | "updatedAt"> {
-  const minPaise = v.priceRangeMinLakhs ? lakhsToPaise(Number(v.priceRangeMinLakhs)) : undefined;
-  const maxPaise = v.priceRangeMaxLakhs ? lakhsToPaise(Number(v.priceRangeMaxLakhs)) : undefined;
+  const minPaise = v.priceRangeMinLakhs ? toPaise(Number(v.priceRangeMinLakhs), v.priceRangeMinUnit) : undefined;
+  const maxPaise = v.priceRangeMaxLakhs ? toPaise(Number(v.priceRangeMaxLakhs), v.priceRangeMaxUnit) : undefined;
   const imageUrls = v.mediaUrls.filter((url) => url.trim());
   const videoUrls = resolvedVideoUrls ?? v.videoUrls.filter((url) => url.trim());
   const primaryIdx = Math.min(v.primaryMediaIndex, Math.max(0, imageUrls.length - 1));
@@ -204,10 +204,11 @@ function formValuesToListingPayload(
   const lng = v.longitude.trim() ? Number(v.longitude) : undefined;
   const floorPlanUrl = resolvedFloorPlanUrl ?? (v.floorPlanUrl.trim() || undefined);
   const features = v.features.length ? v.features : undefined;
+  const featuresOther = v.featuresOther.filter((x) => x.trim()).length ? v.featuresOther.filter((x) => x.trim()) : undefined;
   return {
     ownership: v.ownership,
     ...(v.ownership === "channel-partner" && v.channelPartner && { channelPartner: v.channelPartner }),
-    transactionType: v.transactionType,
+    transactionType: 'buying' as const,
     category: v.category,
     propertyType: v.propertyType,
     area: v.area.trim(),
@@ -226,6 +227,7 @@ function formValuesToListingPayload(
     media,
     ...(floorPlanUrl && { floorPlanUrl }),
     ...(features && { features }),
+    ...(featuresOther && { featuresOther }),
     ...(valueStatement && { valueStatement }),
   } as Omit<Listing, "id" | "createdAt" | "updatedAt">;
 }
@@ -466,25 +468,6 @@ export function ListingForm({
         <h2 className="text-lg font-semibold text-gray-900 mb-4">Listing type</h2>
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Transaction</label>
-            <div className="flex flex-wrap gap-2">
-              {TRANSACTION_OPTIONS.map((o) => (
-                <button
-                  key={o.value}
-                  type="button"
-                  onClick={() => set("transactionType", o.value)}
-                  className={`rounded-lg border-2 px-4 py-2 text-sm font-medium transition-colors ${
-                    values.transactionType === o.value
-                      ? "border-(--color-accent) bg-(--color-accent) text-white"
-                      : "border-gray-300 bg-white text-gray-700 hover:border-gray-400"
-                  }`}
-                >
-                  {o.label}
-                </button>
-              ))}
-            </div>
-          </div>
-          <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
             <div className="flex flex-wrap gap-2">
               {(["land", "commercial", "residential"] as ListingCategory[]).map((c) => (
@@ -666,28 +649,48 @@ export function ListingForm({
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Price min (₹ lakh)</label>
-              <input
-                type="number"
-                min={0}
-                step={0.5}
-                value={values.priceRangeMinLakhs}
-                onChange={(e) => set("priceRangeMinLakhs", e.target.value)}
-                placeholder="e.g. 75"
-                className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 text-sm"
-              />
+              <label className="block text-sm font-medium text-gray-700 mb-1">Price min</label>
+              <div className="flex gap-2">
+                <input
+                  type="number"
+                  min={0}
+                  step={0.5}
+                  value={values.priceRangeMinLakhs}
+                  onChange={(e) => set("priceRangeMinLakhs", e.target.value)}
+                  placeholder="e.g. 75"
+                  className="flex-1 rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 text-sm"
+                />
+                <select
+                  value={values.priceRangeMinUnit}
+                  onChange={(e) => set("priceRangeMinUnit", e.target.value as "lakh" | "crore")}
+                  className="w-24 rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 text-sm"
+                >
+                  <option value="lakh">Lakh</option>
+                  <option value="crore">Crore</option>
+                </select>
+              </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Price max (₹ lakh)</label>
-              <input
-                type="number"
-                min={0}
-                step={0.5}
-                value={values.priceRangeMaxLakhs}
-                onChange={(e) => set("priceRangeMaxLakhs", e.target.value)}
-                placeholder="e.g. 95"
-                className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 text-sm"
-              />
+              <label className="block text-sm font-medium text-gray-700 mb-1">Price max</label>
+              <div className="flex gap-2">
+                <input
+                  type="number"
+                  min={0}
+                  step={0.5}
+                  value={values.priceRangeMaxLakhs}
+                  onChange={(e) => set("priceRangeMaxLakhs", e.target.value)}
+                  placeholder="e.g. 95"
+                  className="flex-1 rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 text-sm"
+                />
+                <select
+                  value={values.priceRangeMaxUnit}
+                  onChange={(e) => set("priceRangeMaxUnit", e.target.value as "lakh" | "crore")}
+                  className="w-24 rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 text-sm"
+                >
+                  <option value="lakh">Lakh</option>
+                  <option value="crore">Crore</option>
+                </select>
+              </div>
             </div>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -886,8 +889,8 @@ export function ListingForm({
       {/* Section: Features */}
       <section className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
         <h2 className="text-lg font-semibold text-gray-900 mb-2">Features & amenities</h2>
-        <p className="text-sm text-gray-500 mb-4">Select all that apply. These appear as icons on the listing page.</p>
-        <div className="flex flex-wrap gap-2">
+        <p className="text-sm text-gray-500 mb-4">Select all that apply. Add custom facilities in the text field below.</p>
+        <div className="flex flex-wrap gap-2 mb-4">
           {AMENITY_FEATURE_OPTIONS.map((opt) => {
             const Icon = opt.icon;
             const checked = values.features.includes(opt.key);
@@ -918,6 +921,24 @@ export function ListingForm({
               </label>
             );
           })}
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Other facilities (comma-separated)</label>
+          <input
+            type="text"
+            value={values.featuresOther.join(", ")}
+            onChange={(e) =>
+              set(
+                "featuresOther",
+                e.target.value
+                  .split(",")
+                  .map((x) => x.trim())
+                  .filter(Boolean)
+              )
+            }
+            placeholder="e.g. Conference room, Cafeteria"
+            className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 text-sm"
+          />
         </div>
       </section>
 

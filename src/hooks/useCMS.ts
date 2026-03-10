@@ -296,16 +296,29 @@ const DUMMY_LISTINGS: Listing[] = [
   },
 ];
 
+/** Feature filter name -> listing feature key (for modal filters). */
+const FEATURE_FILTER_MAP: Record<string, string> = {
+  'Swimming pool': 'pool', Balcony: 'balcony', 'Outdoor area': 'garden',
+  'Air conditioning': 'ac', Elevator: 'lift',
+}
+
 export const useListings = (
   filters?: {
     category?: Listing['category']
-    transactionType?: Listing['transactionType']
     /** Price min in lakhs (e.g. 75 = ₹75L). Listing passes if its max price >= this. */
     priceMin?: number
     /** Price max in lakhs (e.g. 100 = ₹1Cr). Listing passes if its min price <= this. */
     priceMax?: number
     /** Area/locality search: listings whose area (or propertyType) contains this string (case-insensitive). */
     areaSearch?: string
+    /** Outdoor/indoor/climate/accessibility feature names from filter modal. */
+    outdoor?: string[]
+    indoor?: string[]
+    climate?: string[]
+    accessibility?: string[]
+    keywords?: string
+    bedroomsMin?: number
+    bedroomsMax?: number
   },
   options?: { forAdmin?: boolean }
 ) => {
@@ -350,9 +363,16 @@ export const useListings = (
   const priceMinPaise = filters?.priceMin != null ? filters.priceMin * 1_00_000 : null
   const priceMaxPaise = filters?.priceMax != null ? filters.priceMax * 1_00_000 : null
   const areaQuery = filters?.areaSearch?.trim().toLowerCase() ?? ''
+  const keywords = filters?.keywords?.trim().toLowerCase() ?? ''
+  const featureKeys = new Set<string>()
+  for (const arr of [filters?.outdoor ?? [], filters?.indoor ?? [], filters?.climate ?? [], filters?.accessibility ?? []]) {
+    for (const name of arr) {
+      const key = FEATURE_FILTER_MAP[name]
+      if (key) featureKeys.add(key)
+    }
+  }
   const filtered = sourceList.filter((l) => {
     if (filters?.category && l.category !== filters.category) return false
-    if (filters?.transactionType && l.transactionType !== filters.transactionType) return false
     if (priceMinPaise != null) {
       const listingMax = l.priceRangeMax ?? l.priceRangeMin ?? 0
       if (listingMax < priceMinPaise) return false
@@ -365,6 +385,25 @@ export const useListings = (
       const area = (l.area ?? '').toLowerCase()
       const propertyType = (l.propertyType ?? '').toLowerCase()
       if (!area.includes(areaQuery) && !propertyType.includes(areaQuery)) return false
+    }
+    if (filters?.bedroomsMin != null && (l.bedrooms ?? 0) < filters.bedroomsMin) return false
+    if (filters?.bedroomsMax != null && (l.bedrooms ?? Infinity) > filters.bedroomsMax) return false
+    if (featureKeys.size > 0) {
+      const listingFeatures = new Set(l.features ?? [])
+      for (const k of featureKeys) {
+        if (!listingFeatures.has(k as never)) return false
+      }
+    }
+    if (keywords) {
+      const searchText = [
+        l.area ?? '',
+        l.propertyType ?? '',
+        l.name ?? '',
+        l.address ?? '',
+        l.valueStatement ?? '',
+        (l.features ?? []).join(' '),
+      ].join(' ').toLowerCase()
+      if (!searchText.includes(keywords)) return false
     }
     return true
   })
