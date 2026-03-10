@@ -621,10 +621,12 @@ export const useEnquiries = () => {
 }
 
 export const addEnquiry = async (enquiry: Omit<Enquiry, 'id' | 'createdAt'>) => {
-  return await addDoc(collection(db, 'enquiries'), {
-    ...enquiry,
-    createdAt: new Date().toISOString(),
-  })
+  const sanitized = Object.fromEntries(
+    Object.entries({ ...enquiry, createdAt: new Date().toISOString() }).filter(
+      ([, v]) => v !== undefined
+    )
+  )
+  return await addDoc(collection(db, 'enquiries'), sanitized)
 }
 
 export const deleteEnquiry = async (id: string) => {
