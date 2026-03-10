@@ -23,6 +23,7 @@ import {
   NUMERIC_FEATURE_KEYS,
   getFeatureOption,
 } from "@/lib/listingFeatures";
+import { parseLatLngFromMapLink } from "@/lib/mapLink";
 
 const WHATSAPP_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "919881199152";
 
@@ -130,10 +131,23 @@ export default function ListingDetailPage() {
   };
 
   const title = listing.name?.trim() || `${listing.area} – ${listing.propertyType}`;
-  const hasLatLng = listing.latitude != null && listing.longitude != null;
+
+  // Resolve coordinates: use stored lat/lng if valid (not 0,0), otherwise parse from mapLink
+  const storedValid =
+    listing.latitude != null &&
+    listing.longitude != null &&
+    (listing.latitude !== 0 || listing.longitude !== 0);
+  const parsedFromLink = listing.mapLink?.trim()
+    ? parseLatLngFromMapLink(listing.mapLink)
+    : null;
+  const embedLatLng = storedValid
+    ? { lat: listing.latitude!, lng: listing.longitude! }
+    : parsedFromLink;
+
+  const hasLatLng = embedLatLng != null;
   const mapUrl =
     listing.mapLink?.trim() ||
-    (hasLatLng ? `https://www.google.com/maps?q=${listing.latitude},${listing.longitude}` : undefined);
+    (hasLatLng ? `https://www.google.com/maps?q=${embedLatLng!.lat},${embedLatLng!.lng}` : undefined);
 
   // Listing prices are stored in rupees (e.g. 90L = 9_000_000)
   const priceForEmiRupees = listing.priceRangeMax ?? listing.priceRangeMin ?? 0;
@@ -399,10 +413,10 @@ export default function ListingDetailPage() {
             >
               <MapPin className="w-5 h-5" /> View on Google Maps
             </a>
-            {hasLatLng && (
+            {hasLatLng && embedLatLng && (
               <iframe
                 title="Map"
-                src={`https://www.google.com/maps?q=${listing.latitude},${listing.longitude}&z=15&output=embed`}
+                src={`https://www.google.com/maps?q=${embedLatLng.lat},${embedLatLng.lng}&z=15&output=embed`}
                 className="w-full h-64 border-0"
                 allowFullScreen
                 loading="lazy"
