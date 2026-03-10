@@ -621,12 +621,20 @@ export const useEnquiries = () => {
 }
 
 export const addEnquiry = async (enquiry: Omit<Enquiry, 'id' | 'createdAt'>) => {
-  const sanitized = Object.fromEntries(
-    Object.entries({ ...enquiry, createdAt: new Date().toISOString() }).filter(
-      ([, v]) => v !== undefined
-    )
-  )
-  return await addDoc(collection(db, 'enquiries'), sanitized)
+  const data: Record<string, unknown> = {
+    name: enquiry.name,
+    phone: enquiry.phone,
+    requirement: enquiry.requirement,
+    areas: enquiry.areas,
+    createdAt: new Date().toISOString(),
+  }
+  if (enquiry.requirementOther != null && enquiry.requirementOther !== '') {
+    data.requirementOther = enquiry.requirementOther
+  }
+  if (enquiry.budget != null && enquiry.budget !== '') {
+    data.budget = enquiry.budget
+  }
+  return await addDoc(collection(db, 'enquiries'), data)
 }
 
 export const deleteEnquiry = async (id: string) => {

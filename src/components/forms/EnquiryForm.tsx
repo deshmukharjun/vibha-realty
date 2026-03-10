@@ -83,14 +83,17 @@ export function EnquiryForm({ areas = [], whatsappNumber }: EnquiryFormProps) {
       const areasList = [...areasWithOther];
       if (formData.areaOther.trim()) areasList.push(formData.areaOther.trim());
 
-      await addEnquiry({
+      const reqOther = formData.requirementOther.trim();
+      const budgetVal = resolvedBudget.trim();
+      const payload: Parameters<typeof addEnquiry>[0] = {
         name: formData.name,
         phone: fullPhone,
         requirement: formData.requirements,
-        requirementOther: formData.requirementOther.trim() || undefined,
         areas: areasList,
-        budget: resolvedBudget.trim() || undefined,
-      });
+      };
+      if (reqOther) payload.requirementOther = reqOther;
+      if (budgetVal) payload.budget = budgetVal;
+      await addEnquiry(payload);
 
       await addDoc(collection(db, 'notifications'), {
         text: `New Enquiry from ${formData.name}${areasList.length > 0 ? ` for ${areasList.join(", ")}` : " (General)"}`,
