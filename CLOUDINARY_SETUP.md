@@ -20,6 +20,7 @@ Listing images are uploaded to **Cloudinary** instead of Firebase Storage. Follo
   - **Preset name**: e.g. `vibha_listings` (you’ll use this as the preset name in env).
   - **Signing Mode**: **Unsigned** (required for browser uploads).
   - **Folder** (optional): e.g. `listings` so all listing images go into one folder.
+  - **Incoming transformation** (for watermark): In the preset's "Incoming transformations" section, add: `l_text:Arial_48_bold:VIBHA%20REALTIES%0A9881199152,co_white,o_60,fl_layer_apply,g_center` — this burns in centered white text "VIBHA REALTIES" and "9881199152" at 60% opacity.
 - Save.
 
 ## 4. Add env variables
@@ -54,7 +55,7 @@ Restart the dev server after changing env (`npm run dev`).
 
 - Open the admin **New listing** page.
 - Select one or more images, set primary, and click **Save**.
-- Images are watermarked in the browser and then uploaded to Cloudinary; the returned URLs are saved to the listing in Firestore.
+- Images are watermarked during upload via the preset's Incoming Transformation; the returned URLs are saved to the listing in Firestore.
 - Optionally add address, bedrooms/bathrooms/parking, location (lat/lng), floor plan PDF, and features.
 
 ## Optional: existing Firebase Storage

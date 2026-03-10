@@ -140,3 +140,37 @@ body::-webkit-scrollbar {
   box-shadow: 0 0 0 3px
     rgb(var(--color-accent-r) var(--color-accent-g) var(--color-accent-b) / 0.2);
 }
+
+/* EMI calculator range sliders – custom thumb and track */
+.emi-slider {
+  -webkit-appearance: none;
+  appearance: none;
+}
+.emi-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  border: 3px solid white;
+  transition: transform 0.15s ease;
+}
+.emi-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.1);
+}
+.emi-slider::-moz-range-thumb {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  border: 3px solid white;
+  transition: transform 0.15s ease;
+}
+.emi-slider::-moz-range-thumb:hover {
+  transform: scale(1.1);
+}

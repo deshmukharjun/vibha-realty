@@ -27,8 +27,3 @@ export function openWhatsApp(
   const whatsappUrl = `https://wa.me/${formattedPhone}?text=${encodedMessage}`;
   window.open(whatsappUrl, _target);
 }
-
-export function createCallLink(phoneNumber: string): string {
-  const formattedPhone = formatPhoneNumber(phoneNumber);
-  return `tel:+${formattedPhone}`;
-}

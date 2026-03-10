@@ -51,9 +51,22 @@ export type ListingFeatureKey =
   | 'club_house'
   | 'play_area'
 
+/** Channel partner / builder names for listings. */
+export type ChannelPartnerName =
+  | 'Amar Builders'
+  | 'Puranik Builders'
+  | 'Shapoorji Pallonji Joyville'
+  | 'Mantra'
+  | 'Godrej'
+  | 'Kalpataru'
+  | 'Yashada'
+  | 'Kolte Patil'
+
 export interface Listing {
   id: string
   ownership: ListingOwnership
+  /** Builder/channel partner name when ownership is channel-partner. */
+  channelPartner?: ChannelPartnerName
   transactionType: ListingTransactionType
   category: ListingCategory
   area: string

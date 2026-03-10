@@ -19,6 +19,7 @@ interface ListingCardProps {
 export function ListingCard({ listing }: ListingCardProps) {
   const media = listing.media ?? [];
   const primaryMedia = media.find((m) => m.isPrimary) ?? media[0];
+  const firstImage = media.find((m) => m.type === "image");
   const message = `Hi Charushila, I'm interested in the ${listing.category} property in ${listing.area} you listed. Could we talk?`;
   const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
   const detailHref = `/listings/${listing.id}`;
@@ -29,8 +30,18 @@ export function ListingCard({ listing }: ListingCardProps) {
       data-ownership={listing.ownership}
     >
       <Link href={detailHref} className="block">
-        <div className="relative h-40 sm:h-44 w-full p-2">
-          {primaryMedia ? (
+        <div className="relative h-40 sm:h-44 w-full p-2 bg-black">
+          {primaryMedia?.type === "video" ? (
+            <video
+              src={primaryMedia.url}
+              poster={firstImage?.url}
+              muted
+              loop
+              playsInline
+              autoPlay
+              className="w-full h-full object-contain rounded-t-xl"
+            />
+          ) : primaryMedia ? (
             <WatermarkedImage
               src={primaryMedia.url}
               alt={`${listing.area} – ${listing.propertyType}`}
@@ -49,7 +60,12 @@ export function ListingCard({ listing }: ListingCardProps) {
           )}
           {listing.ownership === "channel-partner" && (
             <span className="absolute top-2 right-2 px-2 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-800 border border-amber-200">
-              Partner
+              {listing.channelPartner || "Partner"}
+            </span>
+          )}
+          {primaryMedia?.type === "video" && (
+            <span className="absolute bottom-2 right-2 px-2 py-0.5 rounded text-xs font-medium bg-black/60 text-white">
+              Video
             </span>
           )}
         </div>

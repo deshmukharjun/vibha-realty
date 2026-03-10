@@ -20,7 +20,6 @@ import {
   Building2,
 } from "lucide-react";
 import {
-  LISTING_FEATURE_OPTIONS,
   NUMERIC_FEATURE_KEYS,
   getFeatureOption,
 } from "@/lib/listingFeatures";
@@ -183,7 +182,8 @@ export default function ListingDetailPage() {
           >
             {listing.ownership === "channel-partner" ? (
               <>
-                <Building2 className="w-4 h-4" /> Channel partner listing
+                <Building2 className="w-4 h-4" />
+                {listing.channelPartner ? `${listing.channelPartner}` : "Channel partner listing"}
               </>
             ) : (
               <>
@@ -224,13 +224,13 @@ export default function ListingDetailPage() {
 
         {/* Media gallery */}
         <section className="mb-8 md:mb-10" aria-label="Property images">
-          <div className="rounded-xl border border-gray-200 overflow-hidden bg-gray-100">
-            <div className="relative aspect-[4/3] w-full">
+          <div className="rounded-xl border border-gray-200 overflow-hidden bg-black">
+            <div className="relative aspect-[4/3] w-full flex items-center justify-center">
               {activeMedia?.type === "video" ? (
                 <video
                   src={activeMedia.url}
                   controls
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-contain"
                   poster={
                     primaryMedia?.type === "image"
                       ? toHighResListingImageUrl(primaryMedia.url)
@@ -435,89 +435,108 @@ export default function ListingDetailPage() {
             <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
               <Calculator className="w-5 h-5 text-green-600" /> EMI calculator
             </h2>
-            <p className="text-sm text-gray-600 mb-4">
-              Property value: ₹{priceLakhs >= 1 ? priceLakhs.toLocaleString("en-IN", { maximumFractionDigits: 1 }) : priceLakhs.toFixed(1)} lakh. Adjust down payment and loan split below. For exact figures, consult your bank.
+            <p className="text-sm text-gray-600 mb-6">
+              Property value: ₹{priceLakhs >= 1 ? priceLakhs.toLocaleString("en-IN", { maximumFractionDigits: 1 }) : priceLakhs.toFixed(1)} lakh. Adjust sliders below. For exact figures, consult your bank.
             </p>
 
-            <div className="mb-6">
-              <div className="flex justify-between text-sm mb-2">
-                <span className="font-medium text-gray-700">Down payment</span>
-                <span className="text-green-700 font-semibold">{emiDownPaymentPercent}%</span>
-              </div>
-              <input
-                type="range"
-                min={10}
-                max={50}
-                step={5}
-                value={emiDownPaymentPercent}
-                onChange={(e) => setEmiDownPaymentPercent(Number(e.target.value))}
-                className="w-full h-2.5 rounded-lg appearance-none bg-gray-200 accent-green-600 cursor-pointer"
-                aria-label="Down payment percentage"
-              />
-              <div className="flex justify-between text-xs text-gray-500 mt-1">
-                <span>10%</span>
-                <span>50%</span>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4 mb-4 text-sm">
-              <div className="rounded-lg bg-gray-50 border border-gray-200 p-3">
-                <p className="text-gray-500 font-medium">Down payment</p>
-                <p className="text-gray-900 font-semibold mt-0.5">
-                  ₹{downPaymentLakhs >= 1 ? downPaymentLakhs.toLocaleString("en-IN", { maximumFractionDigits: 1 }) : downPaymentLakhs.toFixed(1)} lakh
-                </p>
-                <p className="text-xs text-gray-500">{emiDownPaymentPercent}% of value</p>
-              </div>
-              <div className="rounded-lg bg-green-50 border border-green-200 p-3">
-                <p className="text-green-700 font-medium">Loan amount</p>
-                <p className="text-green-900 font-semibold mt-0.5">
-                  ₹{loanLakhs >= 1 ? loanLakhs.toLocaleString("en-IN", { maximumFractionDigits: 1 }) : loanLakhs.toFixed(1)} lakh
-                </p>
-                <p className="text-xs text-green-600">{loanPercent}% of value</p>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+            <div className="space-y-6 mb-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Loan tenure (years)
-                </label>
-                <select
+                <div className="flex justify-between items-center mb-2">
+                  <label className="text-sm font-medium text-gray-700">Down payment</label>
+                  <span className="text-base font-bold text-green-700 tabular-nums">{emiDownPaymentPercent}%</span>
+                </div>
+                <input
+                  type="range"
+                  min={10}
+                  max={50}
+                  step={5}
+                  value={emiDownPaymentPercent}
+                  onChange={(e) => setEmiDownPaymentPercent(Number(e.target.value))}
+                  className="emi-slider w-full h-3 rounded-full cursor-pointer"
+                  style={{
+                    background: `linear-gradient(to right, rgb(34 197 94) 0%, rgb(34 197 94) ${((emiDownPaymentPercent - 10) / 40) * 100}%, rgb(229 231 235) ${((emiDownPaymentPercent - 10) / 40) * 100}%, rgb(229 231 235) 100%)`,
+                  }}
+                  aria-label="Down payment percentage"
+                />
+                <div className="flex justify-between text-xs text-gray-400 mt-1.5">
+                  <span>10%</span>
+                  <span>50%</span>
+                </div>
+              </div>
+
+              <div>
+                <div className="flex justify-between items-center mb-2">
+                  <label className="text-sm font-medium text-gray-700">Loan tenure</label>
+                  <span className="text-base font-bold text-green-700 tabular-nums">{emiTenure} years</span>
+                </div>
+                <input
+                  type="range"
+                  min={5}
+                  max={30}
+                  step={5}
                   value={emiTenure}
                   onChange={(e) => setEmiTenure(Number(e.target.value))}
-                  className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 text-sm"
-                >
-                  {[5, 10, 15, 20, 25, 30].map((y) => (
-                    <option key={y} value={y}>
-                      {y} years
-                    </option>
-                  ))}
-                </select>
+                  className="emi-slider w-full h-3 rounded-full cursor-pointer"
+                  style={{
+                    background: `linear-gradient(to right, rgb(34 197 94) 0%, rgb(34 197 94) ${((emiTenure - 5) / 25) * 100}%, rgb(229 231 235) ${((emiTenure - 5) / 25) * 100}%, rgb(229 231 235) 100%)`,
+                  }}
+                  aria-label="Loan tenure in years"
+                />
+                <div className="flex justify-between text-xs text-gray-400 mt-1.5">
+                  <span>5 yr</span>
+                  <span>30 yr</span>
+                </div>
               </div>
+
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Interest rate (% p.a.)
-                </label>
-                <select
+                <div className="flex justify-between items-center mb-2">
+                  <label className="text-sm font-medium text-gray-700">Interest rate (p.a.)</label>
+                  <span className="text-base font-bold text-green-700 tabular-nums">{emiRate}%</span>
+                </div>
+                <input
+                  type="range"
+                  min={7.5}
+                  max={10}
+                  step={0.5}
                   value={emiRate}
                   onChange={(e) => setEmiRate(Number(e.target.value))}
-                  className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 text-sm"
-                >
-                  {[7.5, 8, 8.5, 9, 9.5, 10].map((r) => (
-                    <option key={r} value={r}>
-                      {r}%
-                    </option>
-                  ))}
-                </select>
+                  className="emi-slider w-full h-3 rounded-full cursor-pointer"
+                  style={{
+                    background: `linear-gradient(to right, rgb(34 197 94) 0%, rgb(34 197 94) ${((emiRate - 7.5) / 2.5) * 100}%, rgb(229 231 235) ${((emiRate - 7.5) / 2.5) * 100}%, rgb(229 231 235) 100%)`,
+                  }}
+                  aria-label="Interest rate percent per annum"
+                />
+                <div className="flex justify-between text-xs text-gray-400 mt-1.5">
+                  <span>7.5%</span>
+                  <span>10%</span>
+                </div>
               </div>
             </div>
-            <div className="rounded-lg bg-green-50 border border-green-200 p-4">
-              <p className="text-sm text-gray-600">Estimated EMI (₹/month)</p>
-              <p className="text-2xl font-bold text-green-800">
+
+            <div className="grid grid-cols-2 gap-4 mb-6 text-sm">
+              <div className="rounded-xl bg-gray-50 border border-gray-200 p-4">
+                <p className="text-gray-500 font-medium">Down payment</p>
+                <p className="text-gray-900 font-semibold mt-1 text-lg">
+                  ₹{downPaymentLakhs >= 1 ? downPaymentLakhs.toLocaleString("en-IN", { maximumFractionDigits: 1 }) : downPaymentLakhs.toFixed(1)} lakh
+                </p>
+                <p className="text-xs text-gray-500 mt-0.5">{emiDownPaymentPercent}% of value</p>
+              </div>
+              <div className="rounded-xl bg-green-50 border border-green-200 p-4">
+                <p className="text-green-700 font-medium">Loan amount</p>
+                <p className="text-green-900 font-semibold mt-1 text-lg">
+                  ₹{loanLakhs >= 1 ? loanLakhs.toLocaleString("en-IN", { maximumFractionDigits: 1 }) : loanLakhs.toFixed(1)} lakh
+                </p>
+                <p className="text-xs text-green-600 mt-0.5">{loanPercent}% of value</p>
+              </div>
+            </div>
+
+            <div className="rounded-xl bg-green-50 border-2 border-green-200 p-5">
+              <p className="text-sm text-gray-600 font-medium">Estimated EMI (₹/month)</p>
+              <p className="text-2xl md:text-3xl font-bold text-green-800 mt-1 tabular-nums">
                 ₹{Math.round(monthlyEmi).toLocaleString("en-IN")}
               </p>
-              <p className="text-xs text-gray-500 mt-1">
-                On loan of ₹{loanLakhs >= 1 ? loanLakhs.toLocaleString("en-IN", { maximumFractionDigits: 1 }) : loanLakhs.toFixed(1)} lakh ({loanPercent}%) over {emiTenure} years at {emiRate}% p.a.
+              <p className="text-xs text-gray-500 mt-2">
+                Loan of ₹{loanLakhs >= 1 ? loanLakhs.toLocaleString("en-IN", { maximumFractionDigits: 1 }) : loanLakhs.toFixed(1)} lakh ({loanPercent}%) over {emiTenure} years at {emiRate}% p.a.
               </p>
             </div>
           </section>

@@ -1,8 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useMemo } from "react";
-import { applyWatermark } from "@/lib/applyWatermark";
-import { uploadImage, uploadRawFile, isCloudinaryConfigured } from "@/lib/cloudinary";
+import { uploadImage, uploadVideo, uploadRawFile, isCloudinaryConfigured } from "@/lib/cloudinary";
 import { useAreas } from "@/hooks/useCMS";
 import type {
   Listing,
@@ -12,10 +11,11 @@ import type {
   ListingStatusTag,
   ListingAdminStatus,
   ListingFeatureKey,
+  ChannelPartnerName,
 } from "@/types/cms";
 import { AMENITY_FEATURE_OPTIONS } from "@/lib/listingFeatures";
 import { parseLatLngFromMapLink } from "@/lib/mapLink";
-import { ImagePlus, Star, Trash2, FileText, MapPin } from "lucide-react";
+import { ImagePlus, Star, Trash2, FileText, MapPin, Video } from "lucide-react";
 
 /** Property type options aligned with filter modal. */
 const PROPERTY_TYPE_OPTIONS: { value: string; label: string; category: ListingCategory }[] = [
@@ -44,6 +44,17 @@ const OWNERSHIP_OPTIONS: { value: ListingOwnership; label: string }[] = [
   { value: "channel-partner", label: "Channel Partner" },
 ];
 
+const CHANNEL_PARTNER_OPTIONS: { value: ChannelPartnerName; label: string }[] = [
+  { value: "Amar Builders", label: "Amar Builders" },
+  { value: "Puranik Builders", label: "Puranik Builders" },
+  { value: "Shapoorji Pallonji Joyville", label: "Shapoorji Pallonji Joyville" },
+  { value: "Mantra", label: "Mantra" },
+  { value: "Godrej", label: "Godrej" },
+  { value: "Kalpataru", label: "Kalpataru" },
+  { value: "Yashada", label: "Yashada" },
+  { value: "Kolte Patil", label: "Kolte Patil" },
+];
+
 const STATUS_TAG_OPTIONS: { value: ListingStatusTag | ""; label: string }[] = [
   { value: "", label: "None" },
   { value: "New", label: "New" },
@@ -66,6 +77,7 @@ function paiseToLakhs(p: number): number {
 
 export interface ListingFormValues {
   ownership: ListingOwnership;
+  channelPartner: ChannelPartnerName | "";
   transactionType: ListingTransactionType;
   category: ListingCategory;
   propertyType: string;
@@ -83,6 +95,7 @@ export interface ListingFormValues {
   statusTag: ListingStatusTag | "";
   adminStatus: ListingAdminStatus;
   mediaUrls: string[];
+  videoUrls: string[];
   primaryMediaIndex: number;
   floorPlanUrl: string;
   floorPlanFile: File | null;
@@ -92,6 +105,7 @@ export interface ListingFormValues {
 
 const defaultValues: ListingFormValues = {
   ownership: "personal",
+  channelPartner: "",
   transactionType: "buying",
   category: "residential",
   propertyType: "Apartment & Unit",
@@ -109,6 +123,7 @@ const defaultValues: ListingFormValues = {
   statusTag: "",
   adminStatus: "active",
   mediaUrls: [""],
+  videoUrls: [],
   primaryMediaIndex: 0,
   floorPlanUrl: "",
   floorPlanFile: null,
@@ -116,10 +131,18 @@ const defaultValues: ListingFormValues = {
   valueStatement: "",
 };
 
+const MAX_IMAGES = 13;
+const MAX_VIDEOS = 2;
+
 function listingToFormValues(l: Listing): ListingFormValues {
-  const primaryIdx = l.media.findIndex((m) => m.isPrimary);
+  const images = l.media?.filter((m) => m.type === "image") ?? [];
+  const videos = l.media?.filter((m) => m.type === "video") ?? [];
+  const primaryIdx = images.findIndex((m) => m.isPrimary);
+  const imageUrls = images.map((m) => m.url);
+  const videoUrls = videos.map((m) => m.url);
   return {
     ownership: l.ownership,
+    channelPartner: l.channelPartner ?? "",
     transactionType: l.transactionType,
     category: l.category,
     propertyType: l.propertyType,
@@ -136,7 +159,8 @@ function listingToFormValues(l: Listing): ListingFormValues {
     priceRangeMaxLakhs: l.priceRangeMax != null ? String(paiseToLakhs(l.priceRangeMax)) : "",
     statusTag: l.statusTag ?? "",
     adminStatus: l.adminStatus,
-    mediaUrls: l.media?.length ? l.media.map((m) => m.url) : [""],
+    mediaUrls: imageUrls.length ? imageUrls : [""],
+    videoUrls,
     primaryMediaIndex: primaryIdx >= 0 ? primaryIdx : 0,
     floorPlanUrl: l.floorPlanUrl ?? "",
     floorPlanFile: null,
@@ -147,18 +171,28 @@ function listingToFormValues(l: Listing): ListingFormValues {
 
 function formValuesToListingPayload(
   v: ListingFormValues,
-  resolvedFloorPlanUrl?: string
+  resolvedFloorPlanUrl?: string,
+  resolvedVideoUrls?: string[]
 ): Omit<Listing, "id" | "createdAt" | "updatedAt"> {
   const minPaise = v.priceRangeMinLakhs ? lakhsToPaise(Number(v.priceRangeMinLakhs)) : undefined;
   const maxPaise = v.priceRangeMaxLakhs ? lakhsToPaise(Number(v.priceRangeMaxLakhs)) : undefined;
-  const urls = v.mediaUrls.filter((url) => url.trim());
-  const primaryIdx = Math.min(v.primaryMediaIndex, urls.length - 1);
-  const media = urls.map((url, i) => ({
-    url: url.trim(),
-    type: "image" as const,
-    order: i,
-    isPrimary: i === primaryIdx,
-  }));
+  const imageUrls = v.mediaUrls.filter((url) => url.trim());
+  const videoUrls = resolvedVideoUrls ?? v.videoUrls.filter((url) => url.trim());
+  const primaryIdx = Math.min(v.primaryMediaIndex, Math.max(0, imageUrls.length - 1));
+  const media: { url: string; type: "image" | "video"; order: number; isPrimary: boolean }[] = [
+    ...imageUrls.map((url, i) => ({
+      url: url.trim(),
+      type: "image" as const,
+      order: i,
+      isPrimary: i === primaryIdx,
+    })),
+    ...videoUrls.map((url, i) => ({
+      url: url.trim(),
+      type: "video" as const,
+      order: imageUrls.length + i,
+      isPrimary: false,
+    })),
+  ];
   const valueStatement = v.valueStatement.trim() || undefined;
   const name = v.name.trim() || undefined;
   const address = v.address.trim() || undefined;
@@ -172,6 +206,7 @@ function formValuesToListingPayload(
   const features = v.features.length ? v.features : undefined;
   return {
     ownership: v.ownership,
+    ...(v.ownership === "channel-partner" && v.channelPartner && { channelPartner: v.channelPartner }),
     transactionType: v.transactionType,
     category: v.category,
     propertyType: v.propertyType,
@@ -212,19 +247,29 @@ export function ListingForm({
   const [values, setValues] = useState<ListingFormValues>(
     initialListing ? listingToFormValues(initialListing) : defaultValues
   );
-  /** Image list: existing URLs or pending Files. Upload happens only on Save. */
-  const [mediaItems, setMediaItems] = useState<(string | File)[]>(() =>
-    initialListing?.media?.length ? initialListing.media.map((m) => m.url) : []
-  );
+  /** Image list: existing URLs or pending Files. Max 13. Upload happens only on Save. */
+  const [imageItems, setImageItems] = useState<(string | File)[]>(() => {
+    const imgs = initialListing?.media?.filter((m) => m.type === "image") ?? [];
+    return imgs.length ? imgs.map((m) => m.url) : [];
+  });
+  /** Video list: existing URLs or pending Files. Max 2, optional. No watermark. */
+  const [videoItems, setVideoItems] = useState<(string | File)[]>(() => {
+    const vids = initialListing?.media?.filter((m) => m.type === "video") ?? [];
+    return vids.length ? vids.map((m) => m.url) : [];
+  });
   const [saving, setSaving] = useState(false);
   const [uploadProgress, setUploadProgress] = useState<{ current: number; total: number } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const videoInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (initialListing) {
       setValues(listingToFormValues(initialListing));
-      setMediaItems(initialListing.media?.length ? initialListing.media.map((m) => m.url) : []);
+      const imgs = initialListing.media?.filter((m) => m.type === "image") ?? [];
+      const vids = initialListing.media?.filter((m) => m.type === "video") ?? [];
+      setImageItems(imgs.length ? imgs.map((m) => m.url) : []);
+      setVideoItems(vids.length ? vids.map((m) => m.url) : []);
     }
   }, [initialListing?.id, initialListing?.updatedAt]);
 
@@ -238,19 +283,50 @@ export function ListingForm({
     if (opt.value !== "Other") set("category", opt.category);
   };
 
-  const resolveMediaItemsToUrls = async (): Promise<string[]> => {
+  const MAX_IMAGE_BYTES = 10 * 1024 * 1024; // 10 MB (Cloudinary free tier)
+  const MAX_VIDEO_BYTES = 100 * 1024 * 1024; // 100 MB (Cloudinary free tier)
+
+  const resolveImageUrls = async (): Promise<string[]> => {
     const urls: string[] = [];
-    for (let i = 0; i < mediaItems.length; i++) {
-      setUploadProgress({ current: i + 1, total: mediaItems.length });
-      const item = mediaItems[i];
+    const total = imageItems.length;
+    let skipped = 0;
+    for (let i = 0; i < total; i++) {
+      setUploadProgress({ current: i + 1, total });
+      const item = imageItems[i];
       if (typeof item === "string") {
         urls.push(item);
         continue;
       }
-      const watermarkedFile = await applyWatermark(item);
-      const url = await uploadImage(watermarkedFile, "listings");
+      if (item.size > MAX_IMAGE_BYTES) {
+        skipped++;
+        continue;
+      }
+      const url = await uploadImage(item, "listings");
       urls.push(url);
     }
+    if (skipped > 0) setError(`${skipped} image(s) exceeded 10 MB and were skipped.`);
+    return urls;
+  };
+
+  const resolveVideoUrls = async (): Promise<string[]> => {
+    const urls: string[] = [];
+    const total = imageItems.length + videoItems.length;
+    let skipped = 0;
+    for (let i = 0; i < videoItems.length; i++) {
+      setUploadProgress({ current: imageItems.length + i + 1, total });
+      const item = videoItems[i];
+      if (typeof item === "string") {
+        urls.push(item);
+        continue;
+      }
+      if (item.size > MAX_VIDEO_BYTES) {
+        skipped++;
+        continue;
+      }
+      const url = await uploadVideo(item, "listings/videos");
+      urls.push(url);
+    }
+    if (skipped > 0) setError(`${skipped} video(s) exceeded 100 MB and were skipped.`);
     return urls;
   };
 
@@ -261,23 +337,29 @@ export function ListingForm({
       setError("Area is required.");
       return;
     }
-    if (mediaItems.length === 0) {
+    if (imageItems.length === 0) {
       setError("Add at least one image.");
       return;
     }
-    const hasNewFiles = mediaItems.some((item) => typeof item !== "string");
-    if (hasNewFiles && !isCloudinaryConfigured()) {
-      setError("Image upload is not configured. Add NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME and NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET to .env.local (see CLOUDINARY_SETUP.md).");
+    const hasNewImages = imageItems.some((item) => typeof item !== "string");
+    const hasNewVideos = videoItems.some((item) => typeof item !== "string");
+    if ((hasNewImages || hasNewVideos) && !isCloudinaryConfigured()) {
+      setError("Image/Video upload is not configured. Add NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME and NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET to .env.local (see CLOUDINARY_SETUP.md).");
       return;
     }
-    const primaryIdx = Math.min(values.primaryMediaIndex, mediaItems.length - 1);
+    const primaryIdx = Math.min(values.primaryMediaIndex, Math.max(0, imageItems.length - 1));
     setSaving(true);
     try {
-      const mediaUrls = await resolveMediaItemsToUrls();
+      const mediaUrls = await resolveImageUrls();
+      const resolvedVideoUrls = await resolveVideoUrls();
       setUploadProgress(null);
       let floorPlanUrl: string | undefined = values.floorPlanUrl.trim() || undefined;
       if (values.floorPlanFile && isCloudinaryConfigured()) {
-        floorPlanUrl = await uploadRawFile(values.floorPlanFile, "floorplans");
+        if (values.floorPlanFile.size <= MAX_IMAGE_BYTES) {
+          floorPlanUrl = await uploadRawFile(values.floorPlanFile, "floorplans");
+        } else {
+          setError("Floor plan PDF exceeded 10 MB and was skipped.");
+        }
       }
       const payload = formValuesToListingPayload(
         {
@@ -285,7 +367,8 @@ export function ListingForm({
           mediaUrls,
           primaryMediaIndex: primaryIdx,
         },
-        floorPlanUrl
+        floorPlanUrl,
+        resolvedVideoUrls
       );
       await onSubmit(payload);
     } catch (err) {
@@ -300,31 +383,44 @@ export function ListingForm({
     if (!files?.length) return;
     const valid = Array.from(files).filter((f) => f.type.startsWith("image/"));
     if (valid.length !== files.length) setError("Some files were not images and were skipped.");
-    setMediaItems((prev) => [...prev, ...valid]);
+    setImageItems((prev) => [...prev, ...valid].slice(0, MAX_IMAGES));
     setError(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
-  const removeMediaItem = (index: number) => {
-    if (mediaItems.length <= 1) return;
-    setMediaItems((prev) => prev.filter((_, j) => j !== index));
-    if (values.primaryMediaIndex >= mediaItems.length - 1) {
-      setValues((prev) => ({ ...prev, primaryMediaIndex: Math.max(0, mediaItems.length - 2) }));
+  const addVideoFiles = (files: FileList | null) => {
+    if (!files?.length) return;
+    const valid = Array.from(files).filter((f) => f.type.startsWith("video/"));
+    if (valid.length !== files.length) setError("Some files were not videos and were skipped.");
+    setVideoItems((prev) => [...prev, ...valid].slice(0, MAX_VIDEOS));
+    setError(null);
+    if (videoInputRef.current) videoInputRef.current.value = "";
+  };
+
+  const removeImageItem = (index: number) => {
+    if (imageItems.length <= 1) return;
+    setImageItems((prev) => prev.filter((_, j) => j !== index));
+    if (values.primaryMediaIndex >= imageItems.length - 1) {
+      setValues((prev) => ({ ...prev, primaryMediaIndex: Math.max(0, imageItems.length - 2) }));
     } else if (index < values.primaryMediaIndex) {
       setValues((prev) => ({ ...prev, primaryMediaIndex: prev.primaryMediaIndex - 1 }));
     }
+  };
+
+  const removeVideoItem = (index: number) => {
+    setVideoItems((prev) => prev.filter((_, j) => j !== index));
   };
 
   const setPrimary = (index: number) => {
     setValues((prev) => ({ ...prev, primaryMediaIndex: index }));
   };
 
-  // Stable preview URLs for File items so thumbnails don't get revoked too early (avoids blob ERR_FILE_NOT_FOUND)
+  // Stable preview URLs for image File items (avoids blob ERR_FILE_NOT_FOUND)
   const fileBlobUrlsRef = useRef<Map<File, string>>(new Map());
-  const previewUrls = useMemo(() => {
+  const imagePreviewUrls = useMemo(() => {
     const urls: string[] = [];
     const currentFiles = new Set<File>();
-    for (const item of mediaItems) {
+    for (const item of imageItems) {
       if (typeof item === "string") {
         urls.push(item);
         continue;
@@ -336,16 +432,16 @@ export function ListingForm({
       urls.push(fileBlobUrlsRef.current.get(item)!);
     }
     return urls;
-  }, [mediaItems]);
+  }, [imageItems]);
   useEffect(() => {
-    const files = new Set(mediaItems.filter((x): x is File => typeof x !== "string"));
+    const files = new Set(imageItems.filter((x): x is File => typeof x !== "string"));
     fileBlobUrlsRef.current.forEach((url, file) => {
       if (!files.has(file)) {
         URL.revokeObjectURL(url);
         fileBlobUrlsRef.current.delete(file);
       }
     });
-  }, [mediaItems]);
+  }, [imageItems]);
 
   const propTypeInOptions = PROPERTY_TYPE_OPTIONS.some(
     (p) => p.category === values.category && p.value === values.propertyType
@@ -361,7 +457,7 @@ export function ListingForm({
 
       {uploadProgress && (
         <div className="rounded-xl bg-(--color-secondary) border border-(--color-accent) px-4 py-3 text-sm text-gray-800">
-          Preparing & uploading images… {uploadProgress.current} of {uploadProgress.total}
+          Uploading… {uploadProgress.current} of {uploadProgress.total}
         </div>
       )}
 
@@ -459,6 +555,23 @@ export function ListingForm({
                 </button>
               ))}
             </div>
+            {values.ownership === "channel-partner" && (
+              <div className="mt-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">Channel partner</label>
+                <select
+                  value={values.channelPartner}
+                  onChange={(e) => set("channelPartner", e.target.value as ChannelPartnerName | "")}
+                  className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 text-sm"
+                >
+                  <option value="">Select builder</option>
+                  {CHANNEL_PARTNER_OPTIONS.map((o) => (
+                    <option key={o.value} value={o.value}>
+                      {o.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
           </div>
         </div>
       </section>
@@ -648,7 +761,7 @@ export function ListingForm({
       <section className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
         <h2 className="text-lg font-semibold text-gray-900 mb-1">Images</h2>
         <p className="text-sm text-gray-500 mb-4">
-          Select multiple images. Pick one as primary (shown first). Watermark is applied when you save.
+          Up to {MAX_IMAGES} images. Pick one as primary (shown first). Watermark is applied when you save.
         </p>
         <input
           type="file"
@@ -661,30 +774,68 @@ export function ListingForm({
         <button
           type="button"
           onClick={() => fileInputRef.current?.click()}
-          disabled={saving}
+          disabled={saving || imageItems.length >= MAX_IMAGES}
           className="flex items-center gap-2 rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 px-4 py-3 text-sm font-medium text-gray-700 hover:border-(--color-accent) hover:bg-(--color-secondary)/30 hover:text-gray-900 transition-colors disabled:opacity-50 w-full sm:w-auto"
         >
           <ImagePlus className="w-5 h-5" />
-          Select images
+          Select images ({imageItems.length}/{MAX_IMAGES})
         </button>
-        {mediaItems.length > 0 && (
+        {imageItems.length > 0 && (
           <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-            {mediaItems.map((_, i) => (
+            {imageItems.map((_, i) => (
               <ImageThumbnail
                 key={i}
-                src={previewUrls[i] ?? ""}
+                src={imagePreviewUrls[i] ?? ""}
                 isPrimary={values.primaryMediaIndex === i}
                 onSetPrimary={() => setPrimary(i)}
-                onRemove={() => removeMediaItem(i)}
-                canRemove={mediaItems.length > 1}
+                onRemove={() => removeImageItem(i)}
+                canRemove={imageItems.length > 1}
               />
             ))}
           </div>
         )}
-        {mediaItems.length > 0 && (
+        {imageItems.length > 0 && (
           <p className="mt-2 text-xs text-gray-500">
-            {mediaItems.length} image{mediaItems.length !== 1 ? "s" : ""}. First will be used as primary unless you click the star.
+            {imageItems.length} image{imageItems.length !== 1 ? "s" : ""}. Click the star to set primary.
           </p>
+        )}
+      </section>
+
+      {/* Section: Videos (optional) */}
+      <section className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+        <h2 className="text-lg font-semibold text-gray-900 mb-1 flex items-center gap-2">
+          <Video className="w-5 h-5 text-green-600" /> Videos (optional)
+        </h2>
+        <p className="text-sm text-gray-500 mb-4">
+          Up to {MAX_VIDEOS} videos. No watermark applied.
+        </p>
+        <input
+          type="file"
+          accept="video/*"
+          multiple
+          ref={videoInputRef}
+          onChange={(e) => addVideoFiles(e.target.files)}
+          className="sr-only"
+        />
+        <button
+          type="button"
+          onClick={() => videoInputRef.current?.click()}
+          disabled={saving || videoItems.length >= MAX_VIDEOS}
+          className="flex items-center gap-2 rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 px-4 py-3 text-sm font-medium text-gray-700 hover:border-(--color-accent) hover:bg-(--color-secondary)/30 hover:text-gray-900 transition-colors disabled:opacity-50 w-full sm:w-auto"
+        >
+          <Video className="w-5 h-5" />
+          Select videos ({videoItems.length}/{MAX_VIDEOS})
+        </button>
+        {videoItems.length > 0 && (
+          <div className="mt-4 flex flex-wrap gap-3">
+            {videoItems.map((item, i) => (
+              <VideoThumbnail
+                key={i}
+                item={item}
+                onRemove={() => removeVideoItem(i)}
+              />
+            ))}
+          </div>
         )}
       </section>
 
@@ -785,7 +936,7 @@ export function ListingForm({
       <div className="flex flex-wrap gap-3 pt-2">
         <button
           type="submit"
-          disabled={saving || mediaItems.length === 0}
+          disabled={saving || imageItems.length === 0}
           className="rounded-lg bg-(--color-accent) text-white px-6 py-3 font-medium text-sm hover:brightness-90 disabled:opacity-50 transition-opacity"
         >
           {saving
@@ -856,6 +1007,33 @@ function ImageThumbnail({
           Primary
         </span>
       )}
+    </div>
+  );
+}
+
+/** Video card with remove button. */
+function VideoThumbnail({
+  item,
+  onRemove,
+}: {
+  item: string | File;
+  onRemove: () => void;
+}) {
+  const label = typeof item === "string" ? "Saved video" : item.name;
+  return (
+    <div className="flex items-center gap-3 rounded-lg border-2 border-gray-200 bg-gray-50 px-4 py-3">
+      <Video className="w-8 h-8 text-gray-500 shrink-0" />
+      <span className="text-sm font-medium text-gray-700 truncate max-w-[200px]" title={label}>
+        {label}
+      </span>
+      <button
+        type="button"
+        onClick={onRemove}
+        className="p-1.5 rounded-full bg-red-500/90 text-white hover:bg-red-600 transition-colors shrink-0"
+        title="Remove video"
+      >
+        <Trash2 className="w-4 h-4" />
+      </button>
     </div>
   );
 }
