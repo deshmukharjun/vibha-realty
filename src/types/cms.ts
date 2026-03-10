@@ -130,12 +130,21 @@ export interface Testimonial {
   updatedAt: string
 }
 
+/** Enquiry requirement type – supports multi-select (buy, rent, invest, sell). */
+export type EnquiryRequirement = 'buy' | 'rent' | 'invest' | 'sell'
+
 export interface Enquiry {
   id: string
   name: string
   phone: string
-  requirement: 'buy' | 'rent' | 'invest'
-  area: string
+  /** Selected requirements; stored as array for multi-select. Legacy: single string stored as single-element array. */
+  requirement: EnquiryRequirement[]
+  /** Custom requirement when "Other" is selected. */
+  requirementOther?: string
+  /** Selected areas; stored as array for multi-select. Legacy: area (string) may exist on old records. */
+  areas: string[]
+  /** Budget range (e.g. "50L-80L", "Under 1 Cr", "1.5 Crore"). */
+  budget?: string
   createdAt: string
 }
 

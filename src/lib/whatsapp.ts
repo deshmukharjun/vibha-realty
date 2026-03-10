@@ -6,15 +6,28 @@ export function formatPhoneNumber(phone: string): string {
   return cleaned.length === 10 ? `91${cleaned}` : cleaned;
 }
 
+const REQUIREMENT_LABELS: Record<string, string> = {
+  buy: "buying",
+  rent: "renting",
+  invest: "investing",
+  sell: "selling",
+};
+
 export function createWhatsAppMessage(
   name: string,
-  requirement: string,
-  area?: string
+  requirement: string | string[],
+  areas?: string | string[],
+  budget?: string
 ): string {
-  const areaText = area ? ` in ${area}` : "";
-  // Convert requirement to proper gerund form
-  const requirementText = requirement === "buy" ? "buying" : requirement === "rent" ? "renting" : "investing";
-  return `Hi Charushila, I'm looking for a property${areaText}. My name is ${name}. I'm interested in ${requirementText}. Please help me!`;
+  const areasArr = Array.isArray(areas) ? areas : areas ? [areas] : [];
+  const reqArr = Array.isArray(requirement) ? requirement : requirement ? [requirement] : [];
+  const areaText = areasArr.length > 0 ? ` in ${areasArr.join(", ")}` : "";
+  const requirementText =
+    reqArr.length > 0
+      ? reqArr.map((r) => REQUIREMENT_LABELS[r] ?? r).join(", ")
+      : "property";
+  const budgetText = budget ? ` Budget: ${budget}.` : "";
+  return `Hi Charushila, I'm looking for a property${areaText}. My name is ${name}. I'm interested in ${requirementText}.${budgetText} Please help me!`;
 }
 
 export function openWhatsApp(

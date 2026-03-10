@@ -22,17 +22,28 @@ export default function EnquiriesPage() {
     }
   }
 
-  const getRequirementColor = (requirement: string) => {
-    switch (requirement) {
-      case 'buy':
-        return 'bg-blue-100 text-blue-800'
-      case 'rent':
-        return 'bg-green-100 text-green-800'
-      case 'invest':
-        return 'bg-purple-100 text-purple-800'
-      default:
-        return 'bg-gray-100 text-gray-800'
+  const getRequirementColor = (req: string) => {
+    switch (req) {
+      case 'buy': return 'bg-blue-100 text-blue-800'
+      case 'rent': return 'bg-green-100 text-green-800'
+      case 'invest': return 'bg-purple-100 text-purple-800'
+      case 'sell': return 'bg-amber-100 text-amber-800'
+      default: return 'bg-gray-100 text-gray-800'
     }
+  }
+
+  const getRequirementList = (e: Enquiry): string[] => {
+    const r = (e as { requirement?: string | string[] }).requirement
+    const list = Array.isArray(r) ? r : r ? [r] : []
+    const other = (e as { requirementOther?: string }).requirementOther
+    if (other?.trim()) list.push(other.trim())
+    return list
+  }
+
+  const getAreaList = (e: Enquiry): string[] => {
+    const a = (e as { area?: string; areas?: string[] }).areas
+    const legacy = (e as { area?: string }).area
+    return Array.isArray(a) ? a : legacy ? [legacy] : []
   }
 
   if (loading) return <div>Loading...</div>
@@ -52,7 +63,8 @@ export default function EnquiriesPage() {
                 <th className="px-3 md:px-6 py-3 text-left text-xs md:text-sm font-semibold text-gray-900">Phone</th>
                 <th className="px-3 md:px-6 py-3 text-left text-xs md:text-sm font-semibold text-gray-900">Requirement</th>
                 <th className="px-3 md:px-6 py-3 text-left text-xs md:text-sm font-semibold text-gray-900 hidden sm:table-cell">Area</th>
-                <th className="px-3 md:px-6 py-3 text-left text-xs md:text-sm font-semibold text-gray-900 hidden md:table-cell">Submitted</th>
+                <th className="px-3 md:px-6 py-3 text-left text-xs md:text-sm font-semibold text-gray-900 hidden md:table-cell">Budget</th>
+                <th className="px-3 md:px-6 py-3 text-left text-xs md:text-sm font-semibold text-gray-900 hidden lg:table-cell">Submitted</th>
                 <th className="px-3 md:px-6 py-3 text-right text-xs md:text-sm font-semibold text-gray-900">Actions</th>
               </tr>
             </thead>
@@ -68,16 +80,25 @@ export default function EnquiriesPage() {
                     </a>
                   </td>
                   <td className="px-3 md:px-6 py-3 md:py-4">
-                    <span
-                      className={`px-2 md:px-3 py-0.5 md:py-1 rounded-full text-xs md:text-sm font-medium ${getRequirementColor(
-                        enquiry.requirement
-                      )}`}
-                    >
-                      {enquiry.requirement.charAt(0).toUpperCase() + enquiry.requirement.slice(1)}
-                    </span>
+                    <div className="flex flex-wrap gap-1">
+                      {getRequirementList(enquiry).map((req) => (
+                        <span
+                          key={req}
+                          className={`px-2 py-0.5 rounded-full text-xs font-medium ${getRequirementColor(req)}`}
+                        >
+                          {req.charAt(0).toUpperCase() + req.slice(1)}
+                        </span>
+                      ))}
+                      {getRequirementList(enquiry).length === 0 && <span className="text-gray-400 text-xs">—</span>}
+                    </div>
                   </td>
-                  <td className="px-3 md:px-6 py-3 md:py-4 text-gray-700 text-sm hidden sm:table-cell">{enquiry.area}</td>
+                  <td className="px-3 md:px-6 py-3 md:py-4 text-gray-700 text-sm hidden sm:table-cell">
+                    {getAreaList(enquiry).join(', ') || '—'}
+                  </td>
                   <td className="px-3 md:px-6 py-3 md:py-4 text-gray-700 text-sm hidden md:table-cell">
+                    {(enquiry as { budget?: string }).budget || '—'}
+                  </td>
+                  <td className="px-3 md:px-6 py-3 md:py-4 text-gray-700 text-sm hidden lg:table-cell">
                     {new Date(enquiry.createdAt).toLocaleDateString()}
                   </td>
                   <td className="px-3 md:px-6 py-3 md:py-4 text-right">
