@@ -453,8 +453,11 @@ export default function ListingDetailPage() {
             <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
               <Calculator className="w-5 h-5 text-green-600" /> EMI calculator
             </h2>
+            <p className="text-xs text-gray-500 mb-2">
+              All amounts calculated in Indian Rupees (₹). Property value, down payment, and loan are shown in <strong>Lakhs</strong>; EMI is in <strong>₹ per month</strong>.
+            </p>
             <p className="text-sm text-gray-600 mb-6">
-              Property value: ₹{priceLakhs >= 1 ? priceLakhs.toLocaleString("en-IN", { maximumFractionDigits: 1 }) : priceLakhs.toFixed(1)} lakh. Adjust sliders below. For exact figures, consult your bank.
+              Property value: ₹{priceLakhs >= 1 ? priceLakhs.toLocaleString("en-IN", { maximumFractionDigits: 1 }) : priceLakhs.toFixed(1)} Lakh. Adjust sliders below. For exact figures, consult your bank.
             </p>
 
             <div className="space-y-6 mb-6">

@@ -247,7 +247,8 @@ export function ListingFilterModal({
 
           {/* Price */}
           <div className="py-3 border-b border-gray-200">
-            <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">Price</p>
+            <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">Price (min / max in Lakhs)</p>
+            <p className="text-xs text-gray-500 mb-2">e.g. 100 = ₹1 Crore</p>
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="block text-xs text-gray-500 mb-1">Min</label>

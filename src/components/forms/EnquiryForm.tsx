@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/Button";
+import { PropertyAmountInput } from "@/components/ui/PropertyAmountInput";
 import { addEnquiry } from "@/hooks/useCMS";
 import { db } from '@/lib/firebase';
 import { collection, addDoc } from 'firebase/firestore';
@@ -64,7 +65,7 @@ export function EnquiryForm({ areas = [], whatsappNumber }: EnquiryFormProps) {
   const budgetIsCustom = formData.budget === "Custom";
   const resolvedBudget = budgetIsCustom
     ? formData.budgetCustomValue.trim()
-      ? `${formData.budgetCustomValue} ${formData.budgetCustomUnit === "crore" ? "Crore" : "Lakh"}`
+      ? `${formData.budgetCustomValue} ${formData.budgetCustomUnit === "crore" ? "Crore" : "Lakhs"}`
       : ""
     : formData.budget;
 
@@ -292,28 +293,21 @@ export function EnquiryForm({ areas = [], whatsappNumber }: EnquiryFormProps) {
           ))}
         </select>
         {budgetIsCustom && (
-          <div className="mt-2 flex gap-2">
-            <input
-              type="text"
-              inputMode="decimal"
+          <div className="mt-2">
+            <PropertyAmountInput
               value={formData.budgetCustomValue}
-              onChange={(e) => setFormData((p) => ({ ...p, budgetCustomValue: e.target.value }))}
-              placeholder="e.g. 1.5"
-              className="flex-1 px-4 py-2 border border-(--color-accent) rounded-lg text-black"
-            />
-            <select
-              value={formData.budgetCustomUnit}
-              onChange={(e) =>
+              unit={formData.budgetCustomUnit}
+              onChange={(displayValue, newUnit) =>
                 setFormData((p) => ({
                   ...p,
-                  budgetCustomUnit: e.target.value as "lakh" | "crore",
+                  budgetCustomValue: displayValue,
+                  budgetCustomUnit: newUnit,
                 }))
               }
-              className="px-4 py-2 border border-(--color-accent) rounded-lg text-gray-700 min-w-25"
-            >
-              <option value="lakh">Lakh</option>
-              <option value="crore">Crore</option>
-            </select>
+              placeholder="e.g. 65"
+              inputClassName="px-4 py-2 border border-(--color-accent) rounded-lg text-black"
+              selectClassName="px-4 py-2 border border-(--color-accent) rounded-lg text-gray-700"
+            />
           </div>
         )}
       </div>

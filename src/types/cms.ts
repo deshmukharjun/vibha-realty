@@ -105,7 +105,7 @@ export interface Listing {
 }
 
 export interface ChannelPartner {
-  id: string
+  id: string  
   name: string
   description: string
   propertyTypes: string[]

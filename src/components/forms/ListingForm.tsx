@@ -14,6 +14,8 @@ import type {
 } from "@/types/cms";
 import { AMENITY_FEATURE_OPTIONS } from "@/lib/listingFeatures";
 import { parseLatLngFromMapLink } from "@/lib/mapLink";
+import { parseAmountInput } from "@/lib/amountUtils";
+import { PropertyAmountInput } from "@/components/ui/PropertyAmountInput";
 import { ImagePlus, Star, Trash2, FileText, MapPin, Video } from "lucide-react";
 
 /** Property type options aligned with filter modal. */
@@ -138,6 +140,12 @@ function listingToFormValues(l: Listing): ListingFormValues {
   const primaryIdx = images.findIndex((m) => m.isPrimary);
   const imageUrls = images.map((m) => m.url);
   const videoUrls = videos.map((m) => m.url);
+  const minLakhs = l.priceRangeMin != null ? paiseToLakhs(l.priceRangeMin) : null;
+  const maxLakhs = l.priceRangeMax != null ? paiseToLakhs(l.priceRangeMax) : null;
+  const minUnit: "lakh" | "crore" = minLakhs != null && minLakhs >= 100 ? "crore" : "lakh";
+  const maxUnit: "lakh" | "crore" = maxLakhs != null && maxLakhs >= 100 ? "crore" : "lakh";
+  const minDisplay = minLakhs != null ? (minUnit === "crore" ? String(minLakhs / 100) : String(minLakhs)) : "";
+  const maxDisplay = maxLakhs != null ? (maxUnit === "crore" ? String(maxLakhs / 100) : String(maxLakhs)) : "";
   return {
     ownership: l.ownership,
     channelPartner: l.channelPartner ?? "",
@@ -152,10 +160,10 @@ function listingToFormValues(l: Listing): ListingFormValues {
     mapLink: l.mapLink ?? "",
     latitude: l.latitude != null ? String(l.latitude) : "",
     longitude: l.longitude != null ? String(l.longitude) : "",
-    priceRangeMinLakhs: l.priceRangeMin != null ? String(paiseToLakhs(l.priceRangeMin)) : "",
-    priceRangeMinUnit: "lakh",
-    priceRangeMaxLakhs: l.priceRangeMax != null ? String(paiseToLakhs(l.priceRangeMax)) : "",
-    priceRangeMaxUnit: "lakh",
+    priceRangeMinLakhs: minDisplay,
+    priceRangeMinUnit: minUnit,
+    priceRangeMaxLakhs: maxDisplay,
+    priceRangeMaxUnit: maxUnit,
     statusTag: l.statusTag ?? "",
     adminStatus: l.adminStatus,
     mediaUrls: imageUrls.length ? imageUrls : [""],
@@ -174,8 +182,10 @@ function formValuesToListingPayload(
   resolvedFloorPlanUrl?: string,
   resolvedVideoUrls?: string[]
 ): Omit<Listing, "id" | "createdAt" | "updatedAt"> {
-  const minPaise = v.priceRangeMinLakhs ? toPaise(Number(v.priceRangeMinLakhs), v.priceRangeMinUnit) : undefined;
-  const maxPaise = v.priceRangeMaxLakhs ? toPaise(Number(v.priceRangeMaxLakhs), v.priceRangeMaxUnit) : undefined;
+  const minNum = v.priceRangeMinLakhs ? parseAmountInput(v.priceRangeMinLakhs) : NaN;
+  const maxNum = v.priceRangeMaxLakhs ? parseAmountInput(v.priceRangeMaxLakhs) : NaN;
+  const minPaise = Number.isFinite(minNum) ? toPaise(minNum, v.priceRangeMinUnit) : undefined;
+  const maxPaise = Number.isFinite(maxNum) ? toPaise(maxNum, v.priceRangeMaxUnit) : undefined;
   const imageUrls = v.mediaUrls.filter((url) => url.trim());
   const videoUrls = resolvedVideoUrls ?? v.videoUrls.filter((url) => url.trim());
   const primaryIdx = Math.min(v.primaryMediaIndex, Math.max(0, imageUrls.length - 1));
@@ -648,50 +658,36 @@ export function ListingForm({
             </div>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Price min</label>
-              <div className="flex gap-2">
-                <input
-                  type="number"
-                  min={0}
-                  step={0.5}
-                  value={values.priceRangeMinLakhs}
-                  onChange={(e) => set("priceRangeMinLakhs", e.target.value)}
-                  placeholder="e.g. 75"
-                  className="flex-1 rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 text-sm"
-                />
-                <select
-                  value={values.priceRangeMinUnit}
-                  onChange={(e) => set("priceRangeMinUnit", e.target.value as "lakh" | "crore")}
-                  className="w-24 rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 text-sm"
-                >
-                  <option value="lakh">Lakh</option>
-                  <option value="crore">Crore</option>
-                </select>
-              </div>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Price max</label>
-              <div className="flex gap-2">
-                <input
-                  type="number"
-                  min={0}
-                  step={0.5}
-                  value={values.priceRangeMaxLakhs}
-                  onChange={(e) => set("priceRangeMaxLakhs", e.target.value)}
-                  placeholder="e.g. 95"
-                  className="flex-1 rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 text-sm"
-                />
-                <select
-                  value={values.priceRangeMaxUnit}
-                  onChange={(e) => set("priceRangeMaxUnit", e.target.value as "lakh" | "crore")}
-                  className="w-24 rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 text-sm"
-                >
-                  <option value="lakh">Lakh</option>
-                  <option value="crore">Crore</option>
-                </select>
-              </div>
-            </div>
+            <PropertyAmountInput
+              label="Price min"
+              value={values.priceRangeMinLakhs}
+              unit={values.priceRangeMinUnit}
+              onChange={(displayValue, newUnit) => {
+                setValues((prev) => ({
+                  ...prev,
+                  priceRangeMinLakhs: displayValue,
+                  priceRangeMinUnit: newUnit,
+                }));
+              }}
+              placeholder="e.g. 75"
+              inputClassName="rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 text-sm"
+              selectClassName="rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 text-sm"
+            />
+            <PropertyAmountInput
+              label="Price max"
+              value={values.priceRangeMaxLakhs}
+              unit={values.priceRangeMaxUnit}
+              onChange={(displayValue, newUnit) => {
+                setValues((prev) => ({
+                  ...prev,
+                  priceRangeMaxLakhs: displayValue,
+                  priceRangeMaxUnit: newUnit,
+                }));
+              }}
+              placeholder="e.g. 95"
+              inputClassName="rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 text-sm"
+              selectClassName="rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 text-sm"
+            />
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
