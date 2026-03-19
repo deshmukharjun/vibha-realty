@@ -14,8 +14,7 @@ import type {
 } from "@/types/cms";
 import { AMENITY_FEATURE_OPTIONS } from "@/lib/listingFeatures";
 import { parseLatLngFromMapLink } from "@/lib/mapLink";
-import { parseAmountInput } from "@/lib/amountUtils";
-import { PropertyAmountInput } from "@/components/ui/PropertyAmountInput";
+import { parsePriceRangeTextToRupeesRange, rupeesToHumanReadable } from "@/lib/amountUtils";
 import { ImagePlus, Star, Trash2, FileText, MapPin, Video } from "lucide-react";
 
 /** Property type options aligned with filter modal. */
@@ -64,13 +63,6 @@ const ADMIN_STATUS_OPTIONS: { value: ListingAdminStatus; label: string }[] = [
   { value: "hidden", label: "Hidden" },
 ];
 
-function toPaise(value: number, unit: 'lakh' | 'crore'): number {
-  return unit === 'crore' ? value * 1_00_00_000 : value * 1_00_000;
-}
-function paiseToLakhs(p: number): number {
-  return p / 1_00_000;
-}
-
 export interface ListingFormValues {
   ownership: ListingOwnership;
   channelPartner: ChannelPartnerName | "";
@@ -85,10 +77,9 @@ export interface ListingFormValues {
   mapLink: string;
   latitude: string;
   longitude: string;
-  priceRangeMinLakhs: string;
-  priceRangeMinUnit: 'lakh' | 'crore';
-  priceRangeMaxLakhs: string;
-  priceRangeMaxUnit: 'lakh' | 'crore';
+  priceRangeText: string;
+  priceNegotiable: boolean;
+  youtubeLink: string;
   statusTag: ListingStatusTag | "";
   adminStatus: ListingAdminStatus;
   mediaUrls: string[];
@@ -115,10 +106,9 @@ const defaultValues: ListingFormValues = {
   mapLink: "",
   latitude: "",
   longitude: "",
-  priceRangeMinLakhs: "",
-  priceRangeMinUnit: "lakh",
-  priceRangeMaxLakhs: "",
-  priceRangeMaxUnit: "lakh",
+  priceRangeText: "",
+  priceNegotiable: true,
+  youtubeLink: "",
   statusTag: "",
   adminStatus: "active",
   mediaUrls: [""],
@@ -131,6 +121,14 @@ const defaultValues: ListingFormValues = {
   valueStatement: "",
 };
 
+function normalizeAreasText(raw: string): string {
+  return raw
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean)
+    .join(", ");
+}
+
 const MAX_IMAGES = 13;
 const MAX_VIDEOS = 2;
 
@@ -140,18 +138,12 @@ function listingToFormValues(l: Listing): ListingFormValues {
   const primaryIdx = images.findIndex((m) => m.isPrimary);
   const imageUrls = images.map((m) => m.url);
   const videoUrls = videos.map((m) => m.url);
-  const minLakhs = l.priceRangeMin != null ? paiseToLakhs(l.priceRangeMin) : null;
-  const maxLakhs = l.priceRangeMax != null ? paiseToLakhs(l.priceRangeMax) : null;
-  const minUnit: "lakh" | "crore" = minLakhs != null && minLakhs >= 100 ? "crore" : "lakh";
-  const maxUnit: "lakh" | "crore" = maxLakhs != null && maxLakhs >= 100 ? "crore" : "lakh";
-  const minDisplay = minLakhs != null ? (minUnit === "crore" ? String(minLakhs / 100) : String(minLakhs)) : "";
-  const maxDisplay = maxLakhs != null ? (maxUnit === "crore" ? String(maxLakhs / 100) : String(maxLakhs)) : "";
   return {
     ownership: l.ownership,
     channelPartner: l.channelPartner ?? "",
     category: l.category,
     propertyType: l.propertyType,
-    area: l.area,
+    area: normalizeAreasText(l.area),
     name: l.name ?? "",
     address: l.address ?? "",
     bedrooms: l.bedrooms != null ? String(l.bedrooms) : "",
@@ -160,10 +152,10 @@ function listingToFormValues(l: Listing): ListingFormValues {
     mapLink: l.mapLink ?? "",
     latitude: l.latitude != null ? String(l.latitude) : "",
     longitude: l.longitude != null ? String(l.longitude) : "",
-    priceRangeMinLakhs: minDisplay,
-    priceRangeMinUnit: minUnit,
-    priceRangeMaxLakhs: maxDisplay,
-    priceRangeMaxUnit: maxUnit,
+    priceRangeText:
+      l.priceDisplayText ?? l.priceDisplay ?? l.priceRangeDisplayText ?? "",
+    priceNegotiable: l.priceNegotiable ?? true,
+    youtubeLink: l.youtubeLink ?? "",
     statusTag: l.statusTag ?? "",
     adminStatus: l.adminStatus,
     mediaUrls: imageUrls.length ? imageUrls : [""],
@@ -182,10 +174,7 @@ function formValuesToListingPayload(
   resolvedFloorPlanUrl?: string,
   resolvedVideoUrls?: string[]
 ): Omit<Listing, "id" | "createdAt" | "updatedAt"> {
-  const minNum = v.priceRangeMinLakhs ? parseAmountInput(v.priceRangeMinLakhs) : NaN;
-  const maxNum = v.priceRangeMaxLakhs ? parseAmountInput(v.priceRangeMaxLakhs) : NaN;
-  const minPaise = Number.isFinite(minNum) ? toPaise(minNum, v.priceRangeMinUnit) : undefined;
-  const maxPaise = Number.isFinite(maxNum) ? toPaise(maxNum, v.priceRangeMaxUnit) : undefined;
+  const priceText = v.priceRangeText.trim();
   const imageUrls = v.mediaUrls.filter((url) => url.trim());
   const videoUrls = resolvedVideoUrls ?? v.videoUrls.filter((url) => url.trim());
   const primaryIdx = Math.min(v.primaryMediaIndex, Math.max(0, imageUrls.length - 1));
@@ -221,7 +210,7 @@ function formValuesToListingPayload(
     transactionType: 'buying' as const,
     category: v.category,
     propertyType: v.propertyType,
-    area: v.area.trim(),
+    area: normalizeAreasText(v.area),
     ...(name && { name }),
     ...(address && { address }),
     ...(bedrooms != null && { bedrooms }),
@@ -230,8 +219,9 @@ function formValuesToListingPayload(
     ...(lat != null && { latitude: lat }),
     ...(lng != null && { longitude: lng }),
     ...(mapLink && { mapLink }),
-    ...(minPaise != null && { priceRangeMin: minPaise }),
-    ...(maxPaise != null && { priceRangeMax: maxPaise }),
+    ...(v.priceRangeText.trim() && { priceDisplayText: v.priceRangeText.trim() }),
+    priceNegotiable: v.priceNegotiable,
+    ...(v.youtubeLink.trim() && { youtubeLink: v.youtubeLink.trim() }),
     ...(v.statusTag && { statusTag: v.statusTag }),
     adminStatus: v.adminStatus,
     media,
@@ -345,9 +335,17 @@ export function ListingForm({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    if (!values.area.trim()) {
+    const normalizedArea = normalizeAreasText(values.area);
+    if (!normalizedArea) {
       setError("Area is required.");
       return;
+    }
+    if (values.priceRangeText.trim()) {
+      const parsed = parsePriceRangeTextToRupeesRange(values.priceRangeText);
+      if (parsed.error) {
+        setError(parsed.error);
+        return;
+      }
     }
     if (imageItems.length === 0) {
       setError("Add at least one image.");
@@ -458,6 +456,28 @@ export function ListingForm({
   const propTypeInOptions = PROPERTY_TYPE_OPTIONS.some(
     (p) => p.category === values.category && p.value === values.propertyType
   );
+
+  const parsedPrice = useMemo(
+    () => parsePriceRangeTextToRupeesRange(values.priceRangeText),
+    [values.priceRangeText]
+  );
+
+  const priceCroreSuggestion = useMemo(() => {
+    const s = values.priceRangeText.trim().toLowerCase();
+    if (!s) return null;
+    if (s.includes("-") || s.includes("/") || /\bto\b/.test(s)) return null;
+    const m = s.match(/(\d+(\.\d+)?)\s*(lakh|lakhs|l)\s*\+?$/);
+    if (!m) return null;
+    const hasPlus = /\+$/.test(s);
+    const lakhs = parseFloat(m[1]);
+    if (!Number.isFinite(lakhs) || lakhs <= 99) return null;
+    const crores = lakhs / 100;
+    const croresStr = crores % 1 === 0 ? String(crores) : crores.toFixed(2).replace(/\.?0+$/, "");
+    return {
+      message: `Consider using Crores: ${croresStr}Cr${hasPlus ? '+' : ''}`,
+      replacement: `${croresStr}Cr${hasPlus ? '+' : ''}`,
+    };
+  }, [values.priceRangeText]);
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8 max-w-3xl">
@@ -585,29 +605,21 @@ export function ListingForm({
             <p className="text-xs text-gray-500 mt-1">Shown as the main title on the listing page. If empty, area + property type is used.</p>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Area *</label>
-            {areas.length > 0 ? (
-              <select
-                value={values.area}
-                onChange={(e) => set("area", e.target.value)}
-                className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 text-sm"
-              >
-                <option value="">Select area</option>
-                {areas.map((a) => (
-                  <option key={a.id} value={a.name}>
-                    {a.name}
-                  </option>
-                ))}
-              </select>
-            ) : (
-              <input
-                type="text"
-                value={values.area}
-                onChange={(e) => set("area", e.target.value)}
-                placeholder="e.g. Baner, Wakad"
-                className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 text-sm"
-              />
-            )}
+            <label className="block text-sm font-medium text-gray-700 mb-1">Areas *</label>
+            <input
+              type="text"
+              value={values.area}
+              onChange={(e) => set("area", e.target.value)}
+              placeholder="e.g. Baner, Wakad, Hadapsar"
+              list="area-suggestions"
+              className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 text-sm"
+            />
+            <datalist id="area-suggestions">
+              {areas.map((a) => (
+                <option key={a.id} value={a.name} />
+              ))}
+            </datalist>
+            <p className="text-xs text-gray-500 mt-1">Separate multiple areas with commas.</p>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Address / locality (optional)</label>
@@ -616,6 +628,16 @@ export function ListingForm({
               value={values.address}
               onChange={(e) => set("address", e.target.value)}
               placeholder="e.g. Sector 5, Near XYZ Mall"
+              className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 text-sm"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">YouTube link (optional)</label>
+            <input
+              type="url"
+              value={values.youtubeLink}
+              onChange={(e) => set("youtubeLink", e.target.value)}
+              placeholder="e.g. https://youtu.be/VIDEO_ID"
               className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 text-sm"
             />
           </div>
@@ -657,37 +679,70 @@ export function ListingForm({
               />
             </div>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <PropertyAmountInput
-              label="Price min"
-              value={values.priceRangeMinLakhs}
-              unit={values.priceRangeMinUnit}
-              onChange={(displayValue, newUnit) => {
-                setValues((prev) => ({
-                  ...prev,
-                  priceRangeMinLakhs: displayValue,
-                  priceRangeMinUnit: newUnit,
-                }));
-              }}
-              placeholder="e.g. 75"
-              inputClassName="rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 text-sm"
-              selectClassName="rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 text-sm"
+          <div className="rounded-xl border border-gray-200 bg-white p-4">
+            <label className="block text-sm font-medium text-gray-700 mb-1">Price (optional)</label>
+            <input
+              type="text"
+              value={values.priceRangeText}
+              onChange={(e) => set("priceRangeText", e.target.value)}
+              placeholder="e.g. 25-30L, 1-1.5Cr, 80L+, 10L/acre"
+              className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 text-sm"
             />
-            <PropertyAmountInput
-              label="Price max"
-              value={values.priceRangeMaxLakhs}
-              unit={values.priceRangeMaxUnit}
-              onChange={(displayValue, newUnit) => {
-                setValues((prev) => ({
-                  ...prev,
-                  priceRangeMaxLakhs: displayValue,
-                  priceRangeMaxUnit: newUnit,
-                }));
-              }}
-              placeholder="e.g. 95"
-              inputClassName="rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 text-sm"
-              selectClassName="rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 text-sm"
-            />
+            <p className="text-xs text-gray-500 mt-1">
+              Examples: <span className="font-medium">25-30L</span>, <span className="font-medium">1.25Cr</span>,{" "}
+              <span className="font-medium">10L/acre</span>
+            </p>
+            {values.priceRangeText.trim() && parsedPrice.error && (
+              <p className="text-xs text-red-600 mt-1">{parsedPrice.error}</p>
+            )}
+            {values.priceRangeText.trim() && !parsedPrice.error && (
+              <p className="text-xs text-gray-500 mt-1">
+                {parsedPrice.minRupees != null && parsedPrice.maxRupees != null
+                  ? parsedPrice.minRupees === parsedPrice.maxRupees
+                    ? `You entered: ${rupeesToHumanReadable(parsedPrice.minRupees)}`
+                    : `You entered: ${rupeesToHumanReadable(parsedPrice.minRupees)} - ${rupeesToHumanReadable(parsedPrice.maxRupees)}`
+                  : parsedPrice.minRupees != null
+                    ? `You entered: ${rupeesToHumanReadable(parsedPrice.minRupees)}+`
+                    : parsedPrice.maxRupees != null
+                      ? `You entered: up to ${rupeesToHumanReadable(parsedPrice.maxRupees)}`
+                      : null}
+              </p>
+            )}
+            {priceCroreSuggestion && (
+              <div className="mt-2 text-xs text-amber-700 flex items-center gap-2 flex-wrap">
+                <span>{priceCroreSuggestion.message}</span>
+                <button
+                  type="button"
+                  onClick={() => set("priceRangeText", priceCroreSuggestion.replacement)}
+                  className="underline font-medium hover:no-underline"
+                >
+                  Use it
+                </button>
+              </div>
+            )}
+            <div className="mt-3 flex items-center gap-4">
+              <span className="text-sm font-medium text-gray-700">Price tag</span>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="radio"
+                  name="priceNegotiable"
+                  checked={values.priceNegotiable === true}
+                  onChange={() => set("priceNegotiable", true)}
+                  className="text-green-600 focus:ring-green-500"
+                />
+                <span className="text-sm text-gray-700">Negotiable</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="radio"
+                  name="priceNegotiable"
+                  checked={values.priceNegotiable === false}
+                  onChange={() => set("priceNegotiable", false)}
+                  className="text-green-600 focus:ring-green-500"
+                />
+                <span className="text-sm text-gray-700">Non-negotiable</span>
+              </label>
+            </div>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>

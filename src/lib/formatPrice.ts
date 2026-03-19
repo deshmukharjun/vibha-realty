@@ -6,9 +6,13 @@ export function formatRupeesAsLakhsOrCrore(rupees: number): string {
   const lakhs = rupees / LAKHS;
   if (lakhs >= 100) {
     const cr = lakhs / 100;
-    return cr % 1 === 0 ? `${cr}Cr` : `${cr.toFixed(1)}Cr`;
+    const rounded = Math.round(cr);
+    const isInt = Math.abs(cr - rounded) < 1e-9;
+    return isInt ? `${rounded}Cr` : `${cr.toFixed(1)}Cr`;
   }
-  return `${lakhs.toFixed(lakhs % 1 === 0 ? 0 : 1)}L`;
+  const roundedLakhs = Math.round(lakhs);
+  const isLakhsInt = Math.abs(lakhs - roundedLakhs) < 1e-9;
+  return `${lakhs.toFixed(isLakhsInt ? 0 : 1)}L`;
 }
 
 /**
@@ -16,7 +20,19 @@ export function formatRupeesAsLakhsOrCrore(rupees: number): string {
  */
 export function formatPriceRangeDisplay(minRupees?: number, maxRupees?: number): string {
   if (minRupees != null && maxRupees != null) {
-    return `₹ ${formatRupeesAsLakhsOrCrore(minRupees)} – ₹ ${formatRupeesAsLakhsOrCrore(maxRupees)}`;
+    const lakhsMin = minRupees / LAKHS;
+    const lakhsMax = maxRupees / LAKHS;
+
+    // Collapse "X - X" even if rupees differ slightly due to rounding/parsing.
+    if (Math.round(lakhsMin) === Math.round(lakhsMax)) {
+      return `₹ ${formatRupeesAsLakhsOrCrore(minRupees)}`;
+    }
+
+    const minStr = formatRupeesAsLakhsOrCrore(minRupees);
+    const maxStr = formatRupeesAsLakhsOrCrore(maxRupees);
+    if (minStr === maxStr) return `₹ ${minStr}`;
+
+    return `₹ ${minStr} – ₹ ${maxStr}`;
   }
   if (minRupees != null) return `₹ ${formatRupeesAsLakhsOrCrore(minRupees)}+`;
   if (maxRupees != null) return `Up to ₹ ${formatRupeesAsLakhsOrCrore(maxRupees)}`;

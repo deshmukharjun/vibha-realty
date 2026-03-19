@@ -105,3 +105,95 @@ export function suggestCroreIfOver99Lakh(value: number, unit: AmountUnit): {
   }
   return { suggestCrore: true, valueInCrores: value / 100 };
 }
+
+export type ParsedPriceRange = {
+  minRupees?: number;
+  maxRupees?: number;
+  error?: string;
+};
+
+function detectUnitFromToken(tokenLower: string): AmountUnit | null {
+  const t = tokenLower.trim().replace(/\/.*$/, "");
+  if (/(cr|crore)s?$/.test(t)) return "crore";
+  if (/(lakh|lakhs|l)$/.test(t)) return "lakh";
+  return null;
+}
+
+function parseNumberFromToken(token: string): number {
+  // Keep digits and one decimal point; strip currency symbols/letters.
+  const cleaned = token
+    .replace(/,/g, "")
+    .replace(/₹/g, "")
+    .replace(/[^0-9.]/g, "");
+  if (cleaned === "" || cleaned === ".") return NaN;
+  return parseFloat(cleaned);
+}
+
+/**
+ * Parse admin price expressions into full rupees range.
+ *
+ * Supported examples:
+ * - "25-30L" / "25 - 30 lakh"
+ * - "1-1.5Cr"
+ * - "80L+"
+ * - "Up to 50L"
+ * - "10L/acre" (treated as a single value)
+ */
+export function parsePriceRangeTextToRupeesRange(input: string): ParsedPriceRange {
+  const raw = input.trim();
+  if (!raw) return {};
+
+  const normalized = raw
+    .toLowerCase()
+    .replace(/,/g, "")
+    .replace(/–|—/g, "-")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  const rangeTokens = normalized.split(/\s*(?:-|to)\s*/i).filter(Boolean);
+  const hasRangeSeparator = rangeTokens.length === 2 && (normalized.includes("-") || /\bto\b/i.test(normalized));
+
+  const plusOnly = /\+$/.test(normalized) || /\+\s*$/.test(normalized);
+  const uptoOnly = /^(upto|up to)\b/i.test(normalized);
+
+  const parseSide = (token: string, fallbackUnit: AmountUnit): { valueRupees?: number; unitUsed: AmountUnit | null } => {
+    const unit = detectUnitFromToken(token) ?? fallbackUnit;
+    const num = parseNumberFromToken(token);
+    if (!Number.isFinite(num)) return { unitUsed: null };
+    return { valueRupees: Math.round(amountToRupees(num, unit)), unitUsed: unit };
+  };
+
+  if (hasRangeSeparator) {
+    const [aTokenRaw, bTokenRaw] = rangeTokens;
+    const aToken = aTokenRaw.trim();
+    const bToken = bTokenRaw.trim();
+
+    const unitA = detectUnitFromToken(aToken);
+    const unitB = detectUnitFromToken(bToken);
+    const defaultUnit: AmountUnit =
+      unitA ?? unitB ?? (parseNumberFromToken(aToken) >= 100 ? "crore" : "lakh");
+
+    const aParsed = parseSide(aToken, defaultUnit);
+    const bParsed = parseSide(bToken, unitB ?? unitA ?? defaultUnit);
+
+    if (aParsed.valueRupees == null || bParsed.valueRupees == null) {
+      return { error: "Invalid price range. Try e.g. 25-30L or 1-1.5Cr." };
+    }
+
+    const minRupees = Math.min(aParsed.valueRupees, bParsed.valueRupees);
+    const maxRupees = Math.max(aParsed.valueRupees, bParsed.valueRupees);
+    return { minRupees, maxRupees };
+  }
+
+  // Single value forms
+  const token = normalized.replace(/\+$/, "").trim();
+  const unit = detectUnitFromToken(token) ?? (parseNumberFromToken(token) >= 100 ? "crore" : "lakh");
+  const num = parseNumberFromToken(token);
+  if (!Number.isFinite(num)) return { error: "Invalid price value." };
+
+  const rupees = Math.round(amountToRupees(num, unit));
+
+  if (uptoOnly) return { maxRupees: rupees };
+  if (plusOnly) return { minRupees: rupees };
+  return { minRupees: rupees, maxRupees: rupees };
+}

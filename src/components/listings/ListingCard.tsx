@@ -2,9 +2,9 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { formatPriceRangeDisplay } from "@/lib/formatPrice";
 import { WatermarkedImage } from "./WatermarkedImage";
 import type { Listing } from "@/types/cms";
+import { getListingPriceDisplay } from "@/lib/listingPrice";
 
 const WHATSAPP_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "919881199152";
 
@@ -23,6 +23,7 @@ export function ListingCard({ listing }: ListingCardProps) {
   const message = `Hi Charushila, I'm interested in the ${listing.category} property in ${listing.area} you listed. Could we talk?`;
   const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
   const detailHref = `/listings/${listing.id}`;
+  const priceDisplay = getListingPriceDisplay(listing);
 
   return (
     <article
@@ -74,7 +75,12 @@ export function ListingCard({ listing }: ListingCardProps) {
           <p className="text-gray-900 font-semibold mt-1 text-sm sm:text-base line-clamp-1">
             {listing.name?.trim() || listing.propertyType}
           </p>
-          <p className="text-xs sm:text-sm text-gray-600 mt-0.5">{formatPriceRangeDisplay(listing.priceRangeMin, listing.priceRangeMax)}</p>
+          <p className="text-xs sm:text-sm text-gray-600 mt-0.5">
+            {priceDisplay}
+            {listing.priceNegotiable !== undefined && (
+              <span className="text-gray-500"> · {listing.priceNegotiable ? "Negotiable" : "Non-negotiable"}</span>
+            )}
+          </p>
         </div>
       </Link>
       <div className="px-4 sm:px-5 pb-4 sm:pb-5 -mt-2">

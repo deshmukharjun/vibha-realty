@@ -193,7 +193,7 @@ export function ListingHero() {
               {/* Charushila's Personal Listings */}
               <div className="mb-5 sm:mb-8 md:mb-10">
                 <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2 sm:mb-4">
-                  Charushila&apos;s Personal Listings
+                  Vibha Realties Personal Listings
                 </h3>
                 <div className="rounded-xl bg-(--color-secondary) p-3 sm:p-4 shadow-sm">
                   <HorizontalList hasCards={personal.length > 0}>

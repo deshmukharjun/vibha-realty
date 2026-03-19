@@ -12,6 +12,7 @@ import {
 } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
 import type { Area, ChannelPartner, Testimonial, Enquiry, Listing } from '@/types/cms'
+import { parsePriceRangeTextToRupeesRange } from '@/lib/amountUtils'
 
 /** House/property placeholder images for dummy listings (Unsplash, allowed in next.config remotePatterns). Uses seed so each listing gets a distinct image. Only verified working IDs (some Unsplash IDs 404). */
 const HOUSE_IMAGES = [
@@ -28,6 +29,23 @@ const placeholder = (seed: string) => {
   return `https://images.unsplash.com/photo-${HOUSE_IMAGES[i]}?w=320&h=220&fit=crop`
 }
 
+/** Get listing price bounds for filtering. Uses priceRangeMin/Max if present, else parses priceDisplayText. Returns null if unknown – such listings pass price filters. */
+function getListingPriceBounds(l: Listing): { min: number; max: number } | null {
+  if (l.priceRangeMin != null || l.priceRangeMax != null) {
+    const min = l.priceRangeMin ?? l.priceRangeMax ?? 0
+    const max = l.priceRangeMax ?? l.priceRangeMin ?? Infinity
+    return { min, max }
+  }
+  const text = l.priceDisplayText ?? l.priceDisplay ?? l.priceRangeDisplayText ?? ''
+  if (!text.trim()) return null
+  const parsed = parsePriceRangeTextToRupeesRange(text)
+  if (parsed.error) return null
+  const min = parsed.minRupees ?? parsed.maxRupees
+  const max = parsed.maxRupees ?? parsed.minRupees
+  if (min == null && max == null) return null
+  return { min: min ?? max ?? 0, max: max ?? min ?? Infinity }
+}
+
 /** 7–8 dummy listings for public hero when Firestore returns empty. Mix of personal/channel-partner, categories, and transaction types. */
 const DUMMY_LISTINGS: Listing[] = [
   // ... (Your original 8 listings)
@@ -38,8 +56,7 @@ const DUMMY_LISTINGS: Listing[] = [
     category: 'residential',
     area: 'Baner',
     propertyType: '2 BHK Apartment',
-    priceRangeMin: 75_00_000,
-    priceRangeMax: 95_00_000,
+    priceDisplayText: '75-95L',
     statusTag: 'Hot',
     adminStatus: 'active',
     media: [{ url: placeholder('baner-2bhk'), type: 'image', order: 0, isPrimary: true }],
@@ -53,8 +70,7 @@ const DUMMY_LISTINGS: Listing[] = [
     category: 'residential',
     area: 'Wakad',
     propertyType: '3 BHK Apartment',
-    priceRangeMin: 1_20_00_000,
-    priceRangeMax: 1_50_00_000,
+    priceDisplayText: '1.2-1.5Cr',
     statusTag: 'New',
     adminStatus: 'active',
     media: [{ url: placeholder('wakad-3bhk'), type: 'image', order: 0, isPrimary: true }],
@@ -68,8 +84,7 @@ const DUMMY_LISTINGS: Listing[] = [
     category: 'land',
     area: 'Hadapsar',
     propertyType: 'Residential Plot',
-    priceRangeMin: 50_00_000,
-    priceRangeMax: 70_00_000,
+    priceDisplayText: '50-70L/acre',
     statusTag: 'Limited',
     adminStatus: 'active',
     media: [{ url: placeholder('hadapsar-plot'), type: 'image', order: 0, isPrimary: true }],
@@ -83,8 +98,7 @@ const DUMMY_LISTINGS: Listing[] = [
     category: 'commercial',
     area: 'Kalyani Nagar',
     propertyType: 'Retail Shop',
-    priceRangeMin: 2_00_00_000,
-    priceRangeMax: 2_50_00_000,
+    priceDisplayText: '2-2.5Cr',
     adminStatus: 'active',
     media: [{ url: placeholder('kalyani-shop'), type: 'image', order: 0, isPrimary: true }],
     createdAt: new Date().toISOString(),
@@ -97,8 +111,7 @@ const DUMMY_LISTINGS: Listing[] = [
     category: 'residential',
     area: 'Kothrud',
     propertyType: '2 BHK Ready Apartment',
-    priceRangeMin: 80_00_000,
-    priceRangeMax: 1_00_00_000,
+    priceDisplayText: '80L-1Cr',
     statusTag: 'New',
     adminStatus: 'active',
     media: [{ url: placeholder('kothrud-apt'), type: 'image', order: 0, isPrimary: true }],
@@ -112,7 +125,7 @@ const DUMMY_LISTINGS: Listing[] = [
     category: 'residential',
     area: 'Viman Nagar',
     propertyType: 'Independent Villa',
-    priceRangeMin: 2_50_00_000,
+    priceDisplayText: '2.5Cr+',
     statusTag: 'Hot',
     adminStatus: 'active',
     media: [{ url: placeholder('viman-villa'), type: 'image', order: 0, isPrimary: true }],
@@ -126,8 +139,7 @@ const DUMMY_LISTINGS: Listing[] = [
     category: 'commercial',
     area: 'Pune City',
     propertyType: 'Office Space',
-    priceRangeMin: 1_50_00_000,
-    priceRangeMax: 2_00_00_000,
+    priceDisplayText: '1.5-2Cr',
     adminStatus: 'active',
     media: [{ url: placeholder('pune-office'), type: 'image', order: 0, isPrimary: true }],
     createdAt: new Date().toISOString(),
@@ -140,8 +152,7 @@ const DUMMY_LISTINGS: Listing[] = [
     category: 'land',
     area: 'Hinjewadi',
     propertyType: 'Plot for Construction',
-    priceRangeMin: 60_00_000,
-    priceRangeMax: 85_00_000,
+    priceDisplayText: '60-85L/acre',
     statusTag: 'Limited',
     adminStatus: 'active',
     media: [{ url: placeholder('hinjewadi-plot'), type: 'image', order: 0, isPrimary: true }],
@@ -157,8 +168,7 @@ const DUMMY_LISTINGS: Listing[] = [
     category: 'residential',
     area: 'Balewadi',
     propertyType: '2.5 BHK Apartment',
-    priceRangeMin: 95_00_000,
-    priceRangeMax: 1_15_00_000,
+    priceDisplayText: '95L-1.15Cr',
     statusTag: 'New',
     adminStatus: 'active',
     media: [{ url: placeholder('balewadi-2-5bhk'), type: 'image', order: 0, isPrimary: true }],
@@ -172,8 +182,7 @@ const DUMMY_LISTINGS: Listing[] = [
     category: 'residential',
     area: 'Magarpatta City',
     propertyType: 'Studio Apartment',
-    priceRangeMin: 45_00_000,
-    priceRangeMax: 55_00_000,
+    priceDisplayText: '45-55L',
     adminStatus: 'active',
     media: [{ url: placeholder('magarpatta-studio'), type: 'image', order: 0, isPrimary: true }],
     createdAt: new Date().toISOString(),
@@ -186,7 +195,7 @@ const DUMMY_LISTINGS: Listing[] = [
     category: 'commercial',
     area: 'Bavdhan',
     propertyType: 'Warehouse',
-    priceRangeMin: 3_50_00_000,
+    priceDisplayText: '3.5Cr+',
     statusTag: 'Exclusive',
     adminStatus: 'active',
     media: [{ url: placeholder('bavdhan-warehouse'), type: 'image', order: 0, isPrimary: true }],
@@ -200,8 +209,7 @@ const DUMMY_LISTINGS: Listing[] = [
     category: 'residential',
     area: 'Pimple Saudagar',
     propertyType: '4 BHK Penthouse',
-    priceRangeMin: 2_10_00_000,
-    priceRangeMax: 2_60_00_000,
+    priceDisplayText: '2.1-2.6Cr',
     statusTag: 'Hot',
     adminStatus: 'active',
     media: [{ url: placeholder('pimple-penthouse'), type: 'image', order: 0, isPrimary: true }],
@@ -215,7 +223,7 @@ const DUMMY_LISTINGS: Listing[] = [
     category: 'land',
     area: 'Wagholi',
     propertyType: 'Industrial Land',
-    priceRangeMin: 1_80_00_000,
+    priceDisplayText: '1.8Cr+',
     adminStatus: 'active',
     media: [{ url: placeholder('wagholi-land'), type: 'image', order: 0, isPrimary: true }],
     createdAt: new Date().toISOString(),
@@ -228,8 +236,7 @@ const DUMMY_LISTINGS: Listing[] = [
     category: 'residential',
     area: 'Kharadi',
     propertyType: '1 BHK Smart Home',
-    priceRangeMin: 55_00_000,
-    priceRangeMax: 65_00_000,
+    priceDisplayText: '55-65L',
     statusTag: 'New',
     adminStatus: 'active',
     media: [{ url: placeholder('kharadi-1bhk'), type: 'image', order: 0, isPrimary: true }],
@@ -243,8 +250,7 @@ const DUMMY_LISTINGS: Listing[] = [
     category: 'commercial',
     area: 'Shivajinagar',
     propertyType: 'Showroom Space',
-    priceRangeMin: 4_00_00_000,
-    priceRangeMax: 6_00_00_000,
+    priceDisplayText: '4-6Cr',
     statusTag: 'Premium',
     adminStatus: 'active',
     media: [{ url: placeholder('shivajinagar-showroom'), type: 'image', order: 0, isPrimary: true }],
@@ -258,8 +264,7 @@ const DUMMY_LISTINGS: Listing[] = [
     category: 'residential',
     area: 'Aundh',
     propertyType: 'Duplex Apartment',
-    priceRangeMin: 1_75_00_000,
-    priceRangeMax: 2_15_00_000,
+    priceDisplayText: '1.75-2.15Cr',
     adminStatus: 'active',
     media: [{ url: placeholder('aundh-duplex'), type: 'image', order: 0, isPrimary: true }],
     createdAt: new Date().toISOString(),
@@ -272,7 +277,7 @@ const DUMMY_LISTINGS: Listing[] = [
     category: 'residential',
     area: 'Bibwewadi',
     propertyType: 'Row House',
-    priceRangeMin: 1_40_00_000,
+    priceDisplayText: '1.4Cr+',
     statusTag: 'Limited',
     adminStatus: 'active',
     media: [{ url: placeholder('bibwewadi-rowhouse'), type: 'image', order: 0, isPrimary: true }],
@@ -286,8 +291,7 @@ const DUMMY_LISTINGS: Listing[] = [
     category: 'land',
     area: 'Chakan',
     propertyType: 'NA Plot',
-    priceRangeMin: 35_00_000,
-    priceRangeMax: 45_00_000,
+    priceDisplayText: '35-45L/acre',
     statusTag: 'New',
     adminStatus: 'active',
     media: [{ url: placeholder('chakan-plot'), type: 'image', order: 0, isPrimary: true }],
@@ -373,13 +377,10 @@ export const useListings = (
   }
   const filtered = sourceList.filter((l) => {
     if (filters?.category && l.category !== filters.category) return false
-    if (priceMinPaise != null) {
-      const listingMax = l.priceRangeMax ?? l.priceRangeMin ?? 0
-      if (listingMax < priceMinPaise) return false
-    }
-    if (priceMaxPaise != null) {
-      const listingMin = l.priceRangeMin ?? l.priceRangeMax ?? Infinity
-      if (listingMin > priceMaxPaise) return false
+    const bounds = getListingPriceBounds(l)
+    if (bounds) {
+      if (priceMinPaise != null && bounds.max < priceMinPaise) return false
+      if (priceMaxPaise != null && bounds.min > priceMaxPaise) return false
     }
     if (areaQuery) {
       const area = (l.area ?? '').toLowerCase()

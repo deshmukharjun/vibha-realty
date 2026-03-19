@@ -73,8 +73,23 @@ export interface Listing {
   propertyType: string
   /** Optional display name (e.g. "Land in Baner, Akashay nagar society"). */
   name?: string
+  /** @deprecated Use priceDisplayText. Kept for backward compat when reading old data. */
   priceRangeMin?: number
+  /** @deprecated Use priceDisplayText. Kept for backward compat when reading old data. */
   priceRangeMax?: number
+  /** Optional YouTube walkthrough link for this listing. */
+  youtubeLink?: string
+  /**
+   * Admin-provided price string – exactly what is typed (e.g. "67L/acre", "25-30L", "1.25Cr").
+   * This is the single source of truth for display. No fallback to numeric range.
+   */
+  priceDisplayText?: string
+  /** Whether price is negotiable. When undefined (legacy), negotiable tag is not shown. */
+  priceNegotiable?: boolean
+  /** @deprecated Use priceDisplayText. Kept for backward compat when reading old data. */
+  priceDisplay?: string
+  /** @deprecated Use priceDisplayText. Kept for backward compat when reading old data. */
+  priceRangeDisplayText?: string
   statusTag?: ListingStatusTag
   adminStatus: ListingAdminStatus
   media: ListingMedia[]

@@ -5,10 +5,10 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Container } from "@/components/ui/Container";
-import { formatPriceRangeDisplay } from "@/lib/formatPrice";
 import { WatermarkedImage } from "@/components/listings/WatermarkedImage";
 import { getListingPublic } from "@/hooks/useCMS";
 import type { Listing } from "@/types/cms";
+import { getListingPriceDisplay, getListingPriceForEmiRupees } from "@/lib/listingPrice";
 import {
   ArrowLeft,
   Share2,
@@ -18,6 +18,7 @@ import {
   Calculator,
   User,
   Building2,
+  Youtube,
 } from "lucide-react";
 import {
   NUMERIC_FEATURE_KEYS,
@@ -74,6 +75,35 @@ function emi(principalRupees: number, annualRatePercent: number, tenureYears: nu
   return (P * r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
 }
 
+function extractYouTubeVideoId(urlOrId: string): string | null {
+  const raw = urlOrId.trim();
+  if (!raw) return null;
+
+  // If user pasted a bare ID
+  if (/^[a-zA-Z0-9_-]{10,}$/.test(raw) && !raw.includes("http")) return raw;
+
+  try {
+    const url = new URL(raw);
+    const host = url.hostname.toLowerCase();
+    if (host.includes("youtu.be")) {
+      const id = url.pathname.split("/").filter(Boolean)[0];
+      return id || null;
+    }
+    if (host.includes("youtube.com") || host.includes("m.youtube.com")) {
+      const v = url.searchParams.get("v");
+      if (v) return v;
+      // /embed/VIDEO_ID or /shorts/VIDEO_ID
+      const parts = url.pathname.split("/").filter(Boolean);
+      const embedIdx = parts.findIndex((p) => p === "embed" || p === "shorts");
+      if (embedIdx >= 0 && parts[embedIdx + 1]) return parts[embedIdx + 1];
+      return null;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
 export default function ListingDetailPage() {
   const params = useParams();
   const id = params?.id as string | undefined;
@@ -113,6 +143,7 @@ export default function ListingDetailPage() {
   const message = `Hi Charushila, I'm interested in the ${listing.category} property in ${listing.area} you listed. Could we talk?`;
   const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
   const shareUrl = typeof window !== "undefined" ? window.location.href : "";
+  const priceDisplay = getListingPriceDisplay(listing);
 
   const handleShare = async () => {
     if (navigator.share) {
@@ -120,7 +151,7 @@ export default function ListingDetailPage() {
         await navigator.share({
           title: `${listing.propertyType} in ${listing.area}`,
           url: shareUrl,
-          text: `${listing.propertyType} in ${listing.area} – ${formatPriceRangeDisplay(listing.priceRangeMin, listing.priceRangeMax)}`,
+          text: `${listing.propertyType} in ${listing.area} – ${priceDisplay}`,
         });
       } catch {
         if (navigator.clipboard) navigator.clipboard.writeText(shareUrl);
@@ -149,8 +180,7 @@ export default function ListingDetailPage() {
     listing.mapLink?.trim() ||
     (hasLatLng ? `https://www.google.com/maps?q=${embedLatLng!.lat},${embedLatLng!.lng}` : undefined);
 
-  // Listing prices are stored in rupees (e.g. 90L = 9_000_000)
-  const priceForEmiRupees = listing.priceRangeMax ?? listing.priceRangeMin ?? 0;
+  const priceForEmiRupees = getListingPriceForEmiRupees(listing);
   const loanPercent = 100 - emiDownPaymentPercent;
   const loanPrincipalRupees = Math.round((priceForEmiRupees * loanPercent) / 100);
   const downPaymentRupees = Math.round((priceForEmiRupees * emiDownPaymentPercent) / 100);
@@ -159,6 +189,8 @@ export default function ListingDetailPage() {
   const priceLakhs = priceForEmiRupees / LAKHS;
   const loanLakhs = loanPrincipalRupees / LAKHS;
   const downPaymentLakhs = downPaymentRupees / LAKHS;
+
+  const youtubeVideoId = extractYouTubeVideoId(listing.youtubeLink ?? "");
 
   return (
     <div className="bg-(--color-primary) min-h-screen">
@@ -232,7 +264,10 @@ export default function ListingDetailPage() {
             )}
           </div>
           <p className="mt-3 text-xl md:text-2xl font-semibold text-green-700">
-            {formatPriceRangeDisplay(listing.priceRangeMin, listing.priceRangeMax)}
+            {priceDisplay}
+            {listing.priceNegotiable !== undefined && (
+              <span className="text-base font-normal text-gray-600 ml-2">({listing.priceNegotiable ? "Negotiable" : "Non-negotiable"})</span>
+            )}
           </p>
         </div>
 
@@ -302,6 +337,38 @@ export default function ListingDetailPage() {
           </div>
         </section>
 
+        {listing.youtubeLink?.trim() && youtubeVideoId && (
+          <section className="mb-8 md:mb-10 rounded-xl border border-gray-200 p-6 bg-white">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+              <Youtube className="w-5 h-5 text-green-600" /> YouTube walkthrough
+            </h2>
+            <div className="aspect-video w-full rounded-lg overflow-hidden border border-gray-200 bg-black">
+              <iframe
+                title="YouTube walkthrough"
+                src={`https://www.youtube.com/embed/${youtubeVideoId}`}
+                className="w-full h-full"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            </div>
+          </section>
+        )}
+
+        {listing.youtubeLink?.trim() && !youtubeVideoId && (
+          <section className="mb-8 md:mb-10 rounded-xl border border-gray-200 p-6 bg-white">
+            <h2 className="text-lg font-semibold text-gray-900 mb-2">YouTube walkthrough</h2>
+            <a
+              href={listing.youtubeLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-green-700 font-medium hover:underline"
+            >
+              {listing.youtubeLink}
+            </a>
+          </section>
+        )}
+
         {/* Features with icons */}
         <section className="mb-8 md:mb-10 rounded-xl border border-gray-200 p-6 bg-white">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Features</h2>
@@ -369,7 +436,7 @@ export default function ListingDetailPage() {
               ) : (
                 <p>
                   {listing.propertyType} in {listing.area}.{" "}
-                  {formatPriceRangeDisplay(listing.priceRangeMin, listing.priceRangeMax)}. Get
+                  {priceDisplay}. Get
                   in touch for full details, visit, or inspection.
                 </p>
               )}
@@ -396,7 +463,10 @@ export default function ListingDetailPage() {
             <div>
               <dt className="text-gray-500 font-medium">Price</dt>
               <dd className="mt-0.5 font-medium text-green-700">
-                {formatPriceRangeDisplay(listing.priceRangeMin, listing.priceRangeMax)}
+                {priceDisplay}
+                {listing.priceNegotiable !== undefined && (
+                  <span className="font-normal text-gray-600"> ({listing.priceNegotiable ? "Negotiable" : "Non-negotiable"})</span>
+                )}
               </dd>
             </div>
           </dl>
@@ -448,7 +518,7 @@ export default function ListingDetailPage() {
         )}
 
         {/* EMI calculator */}
-        {(listing.priceRangeMin != null || listing.priceRangeMax != null) && (
+        {priceForEmiRupees > 0 && (
           <section className="mb-8 md:mb-10 rounded-xl border border-gray-200 p-6 bg-white">
             <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
               <Calculator className="w-5 h-5 text-green-600" /> EMI calculator
